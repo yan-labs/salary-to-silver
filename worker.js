@@ -148,8 +148,15 @@ async function generateOGImage(priceData, salary = null) {
     </g>
   </g>
 
-  <!-- 底部网址 -->
-  <text x="600" y="590" font-family="Arial, sans-serif" font-size="20" fill="#c73e3a" text-anchor="middle" font-weight="500">jjjl.lol</text>
+  <!-- 底部网址 - 书法卷轴式 -->
+  <g transform="translate(600, 580)">
+    <line x1="-120" y1="-15" x2="-40" y2="-15" stroke="#c73e3a" stroke-width="1" opacity="0.4"/>
+    <line x1="40" y1="-15" x2="120" y2="-15" stroke="#c73e3a" stroke-width="1" opacity="0.4"/>
+    <circle cx="-130" cy="-15" r="3" fill="#c73e3a" opacity="0.6"/>
+    <circle cx="130" cy="-15" r="3" fill="#c73e3a" opacity="0.6"/>
+    <text x="0" y="0" font-family="Georgia, 'Times New Roman', serif" font-size="22" fill="#1a1612" text-anchor="middle" letter-spacing="6" font-weight="500">jjjl.lol</text>
+    <line x1="-60" y1="12" x2="60" y2="12" stroke="#c73e3a" stroke-width="1.5" opacity="0.3"/>
+  </g>
 </svg>`;
 
     return svg;
