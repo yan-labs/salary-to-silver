@@ -12,7 +12,8 @@ const CONVERSION = {
 
 const DEFAULT_SILVER_PRICE = 22.5;
 
-const RANK_DATA = [
+// 简体中文品级数据
+const RANK_DATA_ZH_CN = [
     { grade: "正一品", position: "太师、太傅、太保", monthlyLiang: 87, description: "位极人臣，一人之下万人之上。掌国家大政，辅佐天子。", sealChar: "极" },
     { grade: "从一品", position: "少师、少傅、少保", monthlyLiang: 74, description: "朝廷重臣，参与机要。虽非宰执，亦为国之栋梁。", sealChar: "贵" },
     { grade: "正二品", position: "六部尚书、都御史", monthlyLiang: 61, description: "执掌一部，统领百官。国家大事，皆需过目。", sealChar: "尊" },
@@ -39,12 +40,224 @@ const RANK_DATA = [
     { grade: "乞丐", position: "沿街乞讨", monthlyLiang: 0, description: "身无分文，沿街讨饭。世态炎凉，尝尽人间苦。", sealChar: "丐" },
 ];
 
+// 繁体中文品级数据
+const RANK_DATA_ZH_TW = [
+    { grade: "正一品", position: "太師、太傅、太保", monthlyLiang: 87, description: "位極人臣，一人之下萬人之上。掌國家大政，輔佐天子。", sealChar: "極" },
+    { grade: "從一品", position: "少師、少傅、少保", monthlyLiang: 74, description: "朝廷重臣，參與機要。雖非宰執，亦為國之棟梁。", sealChar: "貴" },
+    { grade: "正二品", position: "六部尚書、都御史", monthlyLiang: 61, description: "執掌一部，統領百官。國家大事，皆需過目。", sealChar: "尊" },
+    { grade: "從二品", position: "布政使、按察使", monthlyLiang: 48, description: "封疆大吏，一省之長。民生刑獄，皆在掌中。", sealChar: "顯" },
+    { grade: "正三品", position: "參政、副使", monthlyLiang: 35, description: "省級要員，輔佐藩臺。承上啟下，政務繁忙。", sealChar: "榮" },
+    { grade: "從三品", position: "知府、參議", monthlyLiang: 26, description: "太守之職，一府之主。教化百姓，興利除弊。", sealChar: "達" },
+    { grade: "正四品", position: "知州、同知", monthlyLiang: 24, description: "州官之任，承宣政令。民間疾苦，悉心關照。", sealChar: "正" },
+    { grade: "從四品", position: "通判、僉事", monthlyLiang: 21, description: "佐貳之官，分理庶務。雖非正印，亦有實權。", sealChar: "佐" },
+    { grade: "正五品", position: "知縣、郎中", monthlyLiang: 16, description: "親民之官，百里侯也。一縣之事，皆賴此身。", sealChar: "治" },
+    { grade: "從五品", position: "員外郎、州同", monthlyLiang: 14, description: "部院屬官，辦理政務。雖位不高，亦有作為。", sealChar: "理" },
+    { grade: "正六品", position: "通判、主事", monthlyLiang: 10, description: "中層官員，承辦公文。勤勉任事，漸入仕途。", sealChar: "勤" },
+    { grade: "從六品", position: "縣丞、推官", monthlyLiang: 8, description: "縣中佐官，協理縣務。刑名錢糧，各有分管。", sealChar: "勉" },
+    { grade: "正七品", position: "縣令、知事", monthlyLiang: 7.5, description: "芝麻小官，卻是起點。古人云：不積跬步，無以至千里。", sealChar: "始" },
+    { grade: "從七品", position: "主簿、判官", monthlyLiang: 7, description: "掌管文書，記錄在案。雖是末吏，亦需謹慎。", sealChar: "記" },
+    { grade: "正八品", position: "縣丞佐官", monthlyLiang: 6.5, description: "小小官職，初入仕林。前路漫漫，尚需努力。", sealChar: "初" },
+    { grade: "從八品", position: "訓導、司獄", monthlyLiang: 6, description: "末流小吏，勉強糊口。但求無過，安穩度日。", sealChar: "末" },
+    { grade: "正九品", position: "典史、巡檢", monthlyLiang: 5.5, description: "九品芝麻官，亦是朝廷命官。雖卑微，勝於白丁。", sealChar: "卑" },
+    { grade: "從九品", position: "驛丞、河泊", monthlyLiang: 5, description: "末等官員，勉強入品。驛站河道，各司其職。", sealChar: "微" },
+    { grade: "未入流", position: "小吏、書辦", monthlyLiang: 3, description: "不入品級，但有公職。衙門差事，混口飯吃。", sealChar: "吏" },
+    { grade: "富農", position: "殷實之家", monthlyLiang: 2, description: "家有薄產，衣食無憂。雖非官宦，亦是鄉紳。", sealChar: "農" },
+    { grade: "自耕農", position: "普通農戶", monthlyLiang: 1.5, description: "一畝三分地，日出而作。勤勞節儉，養家糊口。", sealChar: "耕" },
+    { grade: "佃戶", position: "租田為生", monthlyLiang: 0.8, description: "無田可耕，租種他人。辛苦一年，所剩無幾。", sealChar: "佃" },
+    { grade: "貧民", position: "打零工者", monthlyLiang: 0.5, description: "無田無業，做工度日。今朝有酒今朝醉，明日愁來明日憂。", sealChar: "貧" },
+    { grade: "乞丐", position: "沿街乞討", monthlyLiang: 0, description: "身無分文，沿街討飯。世態炎涼，嘗盡人間苦。", sealChar: "丐" },
+];
+
+// 默认使用简体中文
+const RANK_DATA = RANK_DATA_ZH_CN;
+
+// ============ 多语言翻译 ============
+const TRANSLATIONS = {
+    'zh-CN': {
+        meta: {
+            title: '几斤几两 | 月薪换算白银 - 看看你的工资在明朝值多少两银子',
+            ogTitle: '几斤几两 | 你的月薪在明朝值多少两白银？',
+            siteName: '几斤几两',
+        },
+        ui: {
+            silverPrice: '今日银价',
+            priceUnit: '元/克',
+            source: '来源',
+            inputLabel: '请书月俸',
+            inputHint: '（单位：人民币元）',
+            calculate: '开卷验算',
+            resultTitle: '换算明细',
+            silverLabel: '折合白银',
+            liang: '两',
+            qian: '钱',
+            gram: '克',
+            formula: '换算公式',
+            ancientUnit: '古制换算',
+            ancientUnitValue: '1两 ≈ 37.3克，16两 = 1斤',
+            sharePoster: '生成分享海报',
+            posterTitle: '分享海报',
+            saveImage: '保存图片',
+            share: '分享',
+            copyText: '复制分享文案',
+            copied: '已复制 ✓',
+            posterLoading: '文牒生成中',
+            wechatSaveHint: '👆 长按上方图片保存到相册',
+            mobileSaveHint: '📱 长按图片保存，或点击按钮操作',
+            tableTitle: '明朝俸禄品级表',
+            tableHint: '以下数据基于明朝官制，1石米约折银1两',
+            colGrade: '品级',
+            colPosition: '官职',
+            colSalary: '月俸(两)',
+            colModern: '今折(元)',
+            faqTitle: '常见问题',
+            footer1: '本站仅供娱乐参考，历史数据取自明朝官制',
+            footer2: '古今一算，方知斤两',
+            header: '俸',
+            mainTitle: '几斤几两',
+            subTitle: '俸禄换算',
+            tagline: '以今度古，量你几何',
+            langSwitcher: '繁體中文',
+            langSwitcherUrl: '/zh-TW/',
+            dynasty: '大明王朝',
+            docTitle: '身份文牒',
+            monthlySalary: '月俸白银',
+            scanQR: '扫码测你几斤几两',
+        },
+        ranks: RANK_DATA_ZH_CN,
+        faq: [
+            {
+                q: '月薪1万元相当于多少两白银？',
+                a: (price, liang, rank, salary7) => `根据<a href="https://goldprice.org" class="text-vermilion hover:underline" target="_blank" rel="noopener">GoldPrice.org</a>实时数据，当前白银价格为<strong>${price}元/克</strong>，月薪1万元约等于<strong>${liang}两白银</strong>。参照《明史·职官志》记载的俸禄制度，这相当于${rank.grade}${rank.position.split('、')[0]}的月俸（${rank.monthlyLiang}两），是「${rank.description.split('。')[0]}」。`,
+            },
+            {
+                q: '古代一两银子等于多少克？',
+                a: () => `根据《清会典》和明清度量衡研究，<strong>1两银子约等于37.3克</strong>（库平两标准）。古代使用十六两制，即1斤=16两≈596.8克。换算公式：白银克数 = 月薪(元) ÷ 银价(元/克)。`,
+            },
+            {
+                q: '明朝各品级官员月俸是多少？',
+                a: (price, liang, rank, salary7) => `据《明史·食货志》记载，明朝官员俸禄从<strong>正一品太师年俸1044石（月俸87两）</strong>，到<strong>从九品驿丞年俸60石（月俸5两）</strong>不等。正七品县令月俸约7.5两，按当前银价折算约<strong>${salary7.toLocaleString()}元</strong>。未入流小吏月俸约3两，平民农户约1-2两。`,
+            },
+            {
+                q: '这个工具的换算公式是什么？',
+                a: (price, liang, rank, salary7, example) => `换算公式为：<strong>白银克数 = 月薪(元) ÷ 当前银价(元/克)</strong>，然后按明清库平两标准转换：1两=37.3克，1两=10钱。例如月薪10000元，银价${price}元/克，得到${Math.round(10000/price)}克，约<strong>${example.liang}两${example.qian}钱</strong>白银。`,
+            },
+        ],
+        funText: {
+            top: '✦ 位极人臣 · 羡煞旁人 ✦',
+            high: '✦ 封疆大吏 · 前途无量 ✦',
+            mid: '✦ 朝廷命官 · 光宗耀祖 ✦',
+            low: '✦ 芝麻小官 · 也是官身 ✦',
+            bottom: '✦ 虽是末吏 · 胜于白丁 ✦',
+            farmer: '✦ 家有薄产 · 小康人家 ✦',
+            worker: '✦ 勤劳耕作 · 自食其力 ✦',
+            poor: '✦ 穿越需谨慎 · 搬砖保平安 ✦',
+        },
+    },
+    'zh-TW': {
+        meta: {
+            title: '幾斤幾兩 | 月薪換算白銀 - 看看你的薪水在明朝值多少兩銀子',
+            ogTitle: '幾斤幾兩 | 你的月薪在明朝值多少兩白銀？',
+            siteName: '幾斤幾兩',
+        },
+        ui: {
+            silverPrice: '今日銀價',
+            priceUnit: '元/克',
+            source: '來源',
+            inputLabel: '請書月俸',
+            inputHint: '（單位：人民幣元）',
+            calculate: '開卷驗算',
+            resultTitle: '換算明細',
+            silverLabel: '折合白銀',
+            liang: '兩',
+            qian: '錢',
+            gram: '克',
+            formula: '換算公式',
+            ancientUnit: '古制換算',
+            ancientUnitValue: '1兩 ≈ 37.3克，16兩 = 1斤',
+            sharePoster: '生成分享海報',
+            posterTitle: '分享海報',
+            saveImage: '保存圖片',
+            share: '分享',
+            copyText: '複製分享文案',
+            copied: '已複製 ✓',
+            posterLoading: '文牒生成中',
+            wechatSaveHint: '👆 長按上方圖片保存到相冊',
+            mobileSaveHint: '📱 長按圖片保存，或點擊按鈕操作',
+            tableTitle: '明朝俸祿品級表',
+            tableHint: '以下數據基於明朝官制，1石米約折銀1兩',
+            colGrade: '品級',
+            colPosition: '官職',
+            colSalary: '月俸(兩)',
+            colModern: '今折(元)',
+            faqTitle: '常見問題',
+            footer1: '本站僅供娛樂參考，歷史數據取自明朝官制',
+            footer2: '古今一算，方知斤兩',
+            header: '俸',
+            mainTitle: '幾斤幾兩',
+            subTitle: '俸祿換算',
+            tagline: '以今度古，量你幾何',
+            langSwitcher: '简体中文',
+            langSwitcherUrl: '/',
+            dynasty: '大明王朝',
+            docTitle: '身份文牒',
+            monthlySalary: '月俸白銀',
+            scanQR: '掃碼測你幾斤幾兩',
+        },
+        ranks: RANK_DATA_ZH_TW,
+        faq: [
+            {
+                q: '月薪1萬元相當於多少兩白銀？',
+                a: (price, liang, rank, salary7) => `根據<a href="https://goldprice.org" class="text-vermilion hover:underline" target="_blank" rel="noopener">GoldPrice.org</a>即時數據，當前白銀價格為<strong>${price}元/克</strong>，月薪1萬元約等於<strong>${liang}兩白銀</strong>。參照《明史·職官志》記載的俸祿制度，這相當於${rank.grade}${rank.position.split('、')[0]}的月俸（${rank.monthlyLiang}兩），是「${rank.description.split('。')[0]}」。`,
+            },
+            {
+                q: '古代一兩銀子等於多少克？',
+                a: () => `根據《清會典》和明清度量衡研究，<strong>1兩銀子約等於37.3克</strong>（庫平兩標準）。古代使用十六兩制，即1斤=16兩≈596.8克。換算公式：白銀克數 = 月薪(元) ÷ 銀價(元/克)。`,
+            },
+            {
+                q: '明朝各品級官員月俸是多少？',
+                a: (price, liang, rank, salary7) => `據《明史·食貨志》記載，明朝官員俸祿從<strong>正一品太師年俸1044石（月俸87兩）</strong>，到<strong>從九品驛丞年俸60石（月俸5兩）</strong>不等。正七品縣令月俸約7.5兩，按當前銀價折算約<strong>${salary7.toLocaleString()}元</strong>。未入流小吏月俸約3兩，平民農戶約1-2兩。`,
+            },
+            {
+                q: '這個工具的換算公式是什麼？',
+                a: (price, liang, rank, salary7, example) => `換算公式為：<strong>白銀克數 = 月薪(元) ÷ 當前銀價(元/克)</strong>，然後按明清庫平兩標準轉換：1兩=37.3克，1兩=10錢。例如月薪10000元，銀價${price}元/克，得到${Math.round(10000/price)}克，約<strong>${example.liang}兩${example.qian}錢</strong>白銀。`,
+            },
+        ],
+        funText: {
+            top: '✦ 位極人臣 · 羨煞旁人 ✦',
+            high: '✦ 封疆大吏 · 前途無量 ✦',
+            mid: '✦ 朝廷命官 · 光宗耀祖 ✦',
+            low: '✦ 芝麻小官 · 也是官身 ✦',
+            bottom: '✦ 雖是末吏 · 勝於白丁 ✦',
+            farmer: '✦ 家有薄產 · 小康人家 ✦',
+            worker: '✦ 勤勞耕作 · 自食其力 ✦',
+            poor: '✦ 穿越需謹慎 · 搬磚保平安 ✦',
+        },
+    },
+};
+
+// 支持的语言列表
+const SUPPORTED_LOCALES = ['zh-CN', 'zh-TW'];
+const DEFAULT_LOCALE = 'zh-CN';
+
 // ============ 工具函数 ============
-function matchRank(monthlyLiang) {
-    for (const rank of RANK_DATA) {
+function matchRank(monthlyLiang, ranks = RANK_DATA) {
+    for (const rank of ranks) {
         if (monthlyLiang >= rank.monthlyLiang) return rank;
     }
-    return RANK_DATA[RANK_DATA.length - 1];
+    return ranks[ranks.length - 1];
+}
+
+// 从 URL 路径解析语言
+function parseLocaleFromPath(pathname) {
+    if (pathname.startsWith('/zh-TW/') || pathname === '/zh-TW') {
+        return 'zh-TW';
+    }
+    return DEFAULT_LOCALE;
+}
+
+// 获取翻译
+function getTranslations(locale) {
+    return TRANSLATIONS[locale] || TRANSLATIONS[DEFAULT_LOCALE];
 }
 
 function gramToLiangQian(gram) {
@@ -76,8 +289,10 @@ async function getSilverPrice() {
 }
 
 // ============ OG 图片生成 ============
-async function generateOGImage(priceData, salary = null) {
+async function generateOGImage(priceData, salary = null, locale = DEFAULT_LOCALE) {
     const price = priceData.price;
+    const t = getTranslations(locale);
+    const ranks = t.ranks;
 
     // 计算示例数据
     const targetSalary = salary || 10000;
@@ -85,12 +300,22 @@ async function generateOGImage(priceData, salary = null) {
     const liangNum = gram / CONVERSION.GRAM_PER_LIANG;
     const liang = Math.floor(liangNum);
     const qian = Math.round((liangNum - liang) * 10);
-    const rank = matchRank(liangNum);
+    const rank = matchRank(liangNum, ranks);
+
+    // 多语言文本
+    const isTraditional = locale === 'zh-TW';
+    const mainTitle = isTraditional ? '幾斤幾兩' : '几斤几两';
+    const tagline = isTraditional ? '以今度古，量你幾何' : '以今度古，量你几何';
+    const liangChar = isTraditional ? '兩' : '两';
+    const qianChar = isTraditional ? '錢' : '钱';
+    const silverText = isTraditional ? '白銀' : '白银';
+    const priceLabel = isTraditional ? '今日銀價' : '今日银价';
+    const salaryLabel = isTraditional ? '月薪' : '月薪';
 
     // 格式化显示
-    const liangDisplay = qian > 0 ? `${liang}两${qian}钱` : `${liang}两`;
+    const liangDisplay = qian > 0 ? `${liang}${liangChar}${qian}${qianChar}` : `${liang}${liangChar}`;
     const salaryDisplay = targetSalary >= 10000
-        ? `${(targetSalary/10000).toFixed(targetSalary % 10000 === 0 ? 0 : 1)}万`
+        ? `${(targetSalary/10000).toFixed(targetSalary % 10000 === 0 ? 0 : 1)}萬`
         : targetSalary.toLocaleString();
 
     // SVG 模板 - 简洁古风设计
@@ -128,23 +353,23 @@ async function generateOGImage(priceData, salary = null) {
   <!-- 右侧：核心内容 -->
   <g transform="translate(380, 0)">
     <!-- 标题 -->
-    <text x="340" y="120" font-family="Georgia, serif" font-size="52" fill="#1a1612" text-anchor="middle" font-weight="bold" letter-spacing="8">几斤几两</text>
-    <text x="340" y="165" font-family="Arial, sans-serif" font-size="20" fill="#8a8279" text-anchor="middle" letter-spacing="4">以今度古，量你几何</text>
+    <text x="340" y="120" font-family="Georgia, serif" font-size="52" fill="#1a1612" text-anchor="middle" font-weight="bold" letter-spacing="8">${mainTitle}</text>
+    <text x="340" y="165" font-family="Arial, sans-serif" font-size="20" fill="#8a8279" text-anchor="middle" letter-spacing="4">${tagline}</text>
 
     <!-- 分隔线 -->
     <line x1="140" y1="200" x2="540" y2="200" stroke="#c73e3a" stroke-width="2" opacity="0.3"/>
 
     <!-- 换算公式 -->
-    <text x="340" y="270" font-family="Arial, sans-serif" font-size="24" fill="#6b6358" text-anchor="middle">月薪 ¥${salaryDisplay} =</text>
+    <text x="340" y="270" font-family="Arial, sans-serif" font-size="24" fill="#6b6358" text-anchor="middle">${salaryLabel} ¥${salaryDisplay} =</text>
 
     <!-- 核心数字 -->
     <text x="340" y="370" font-family="Georgia, serif" font-size="100" fill="#1a1612" text-anchor="middle" font-weight="bold">${liangDisplay}</text>
-    <text x="340" y="420" font-family="Arial, sans-serif" font-size="24" fill="#8a8279" text-anchor="middle">白银</text>
+    <text x="340" y="420" font-family="Arial, sans-serif" font-size="24" fill="#8a8279" text-anchor="middle">${silverText}</text>
 
     <!-- 银价标签 -->
     <g transform="translate(200, 470)">
       <rect x="0" y="0" width="280" height="40" rx="20" fill="#1a1612" opacity="0.05"/>
-      <text x="140" y="27" font-family="Arial, sans-serif" font-size="16" fill="#6b6358" text-anchor="middle">今日银价 ¥${price.toFixed(2)}/克</text>
+      <text x="140" y="27" font-family="Arial, sans-serif" font-size="16" fill="#6b6358" text-anchor="middle">${priceLabel} ¥${price.toFixed(2)}/克</text>
     </g>
   </g>
 
@@ -170,13 +395,21 @@ async function generateOGImage(priceData, salary = null) {
 export default {
     async fetch(request, env, ctx) {
         const url = new URL(request.url);
+        const pathname = url.pathname;
+
+        // 解析语言
+        const locale = parseLocaleFromPath(pathname);
+        const isNonDefaultLocale = locale !== DEFAULT_LOCALE;
+        const localePrefix = isNonDefaultLocale ? `/${locale}` : '';
 
         // OG 图片路由 - 动态生成 SVG
+        // 支持路径: /og-image.svg 或 /zh-TW/og-image.svg
         // 支持参数: ?salary=10000 自定义月薪
-        if (url.pathname === '/og-image.svg') {
+        if (pathname === '/og-image.svg' || pathname === `${localePrefix}/og-image.svg`) {
             const priceData = await getSilverPrice();
             const salary = url.searchParams.get('salary') ? parseInt(url.searchParams.get('salary')) : null;
-            const svg = await generateOGImage(priceData, salary);
+            const imgLocale = pathname.startsWith('/zh-TW') ? 'zh-TW' : DEFAULT_LOCALE;
+            const svg = await generateOGImage(priceData, salary, imgLocale);
 
             return new Response(svg, {
                 headers: {
@@ -188,21 +421,24 @@ export default {
         }
 
         // API 路由
-        if (url.pathname === '/api/silver-price') {
+        if (pathname === '/api/silver-price') {
             const priceData = await getSilverPrice();
             return new Response(JSON.stringify(priceData), {
                 headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
             });
         }
 
-        // 静态资源
-        if (url.pathname !== '/' && !url.pathname.endsWith('.html')) {
+        // 静态资源（非语言路径，非根路径，非 HTML）
+        const isLocalePath = SUPPORTED_LOCALES.some(l => pathname.startsWith(`/${l}/`) || pathname === `/${l}`);
+        const isRootOrHtml = pathname === '/' || pathname.endsWith('.html');
+        if (!isLocalePath && !isRootOrHtml) {
             return env.ASSETS.fetch(request);
         }
 
         // 主页面 - 服务端渲染
+        // 支持路径: / 或 /zh-TW/
         const priceData = await getSilverPrice();
-        const html = renderHTML(priceData);
+        const html = renderHTML(priceData, locale);
 
         return new Response(html, {
             headers: {
@@ -214,25 +450,28 @@ export default {
 };
 
 // ============ 渲染 HTML ============
-function renderHTML(priceData) {
+function renderHTML(priceData, locale = DEFAULT_LOCALE) {
     const price = priceData.price;
     const source = priceData.source;
+    const t = getTranslations(locale);
+    const ranks = t.ranks;
 
     // 计算示例数据（月薪1万）
     const salary10k = 10000;
     const gram10k = salary10k / price;
     const liang10k = (gram10k / CONVERSION.GRAM_PER_LIANG).toFixed(1);
-    const rank10k = matchRank(gram10k / CONVERSION.GRAM_PER_LIANG);
+    const rank10k = matchRank(gram10k / CONVERSION.GRAM_PER_LIANG, ranks);
 
     // 正七品县令换算
-    const rank7 = RANK_DATA.find(r => r.grade === '正七品');
+    const rank7Key = locale === 'zh-TW' ? '正七品' : '正七品';
+    const rank7 = ranks.find(r => r.grade === rank7Key);
     const salary7 = Math.round(rank7.monthlyLiang * CONVERSION.GRAM_PER_LIANG * price);
 
     // 示例换算
     const example = gramToLiangQian(salary10k / price);
 
     // 生成品级表
-    const tableRows = RANK_DATA.map(rank => {
+    const tableRows = ranks.map(rank => {
         const modernSalary = Math.round(rank.monthlyLiang * CONVERSION.GRAM_PER_LIANG * price);
         return `<tr data-grade="${rank.grade}">
             <td class="rank-grade">${rank.grade}</td>
@@ -242,41 +481,73 @@ function renderHTML(priceData) {
         </tr>`;
     }).join('');
 
+    // URL 前缀
+    const localePrefix = locale === DEFAULT_LOCALE ? '' : `/${locale}`;
+    const canonicalUrl = locale === DEFAULT_LOCALE ? 'https://jjjl.lol/' : `https://jjjl.lol/${locale}/`;
+    const ogImageUrl = locale === DEFAULT_LOCALE ? 'https://jjjl.lol/og-image.svg' : `https://jjjl.lol/${locale}/og-image.svg`;
+    const ogLocale = locale === 'zh-TW' ? 'zh_TW' : 'zh_CN';
+    const htmlLang = locale === 'zh-TW' ? 'zh-TW' : 'zh-CN';
+
     const today = new Date().toISOString().split('T')[0];
 
+    // 动态描述
+    const descriptionText = locale === 'zh-TW'
+        ? `輸入你的現代月薪，立即換算成明朝白銀重量。當前銀價${price}元/克，月薪1萬元約等於${liang10k}兩白銀，相當於明朝${rank10k.grade}${rank10k.position.split('、')[0]}。`
+        : `输入你的现代月薪，立即换算成明朝白银重量。当前银价${price}元/克，月薪1万元约等于${liang10k}两白银，相当于明朝${rank10k.grade}${rank10k.position.split('、')[0]}。`;
+
+    const keywordsText = locale === 'zh-TW'
+        ? '月薪換算白銀,古代俸祿計算器,明朝官職對照,工資換算銀兩,幾斤幾兩,白銀價格換算,古今收入對比'
+        : '月薪换算白银,古代俸禄计算器,明朝官职对照,工资换算银两,几斤几两,白银价格换算,古今收入对比';
+
+    const ogDescText = locale === 'zh-TW'
+        ? `當前銀價${price}元/克，月薪1萬≈${liang10k}兩白銀≈明朝${rank10k.grade}${rank10k.position.split('、')[0]}`
+        : `当前银价${price}元/克，月薪1万≈${liang10k}两白银≈明朝${rank10k.grade}${rank10k.position.split('、')[0]}`;
+
+    const ogImageAlt = locale === 'zh-TW'
+        ? `幾斤幾兩 - 月薪${Math.round(salary10k/1000)}k換算${liang10k}兩白銀，相當於明朝${rank10k.grade}`
+        : `几斤几两 - 月薪${Math.round(salary10k/1000)}k换算${liang10k}两白银，相当于明朝${rank10k.grade}`;
+
+    const twitterImageAlt = locale === 'zh-TW' ? '幾斤幾兩 - 月薪換算白銀工具' : '几斤几两 - 月薪换算白银工具';
+
     return `<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="${htmlLang}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- SEO Meta Tags (实时计算) -->
-    <title>几斤几两 | 月薪换算白银 - 看看你的工资在明朝值多少两银子</title>
-    <meta name="description" content="输入你的现代月薪，立即换算成明朝白银重量。当前银价${price}元/克，月薪1万元约等于${liang10k}两白银，相当于明朝${rank10k.grade}${rank10k.position.split('、')[0]}。">
-    <meta name="keywords" content="月薪换算白银,古代俸禄计算器,明朝官职对照,工资换算银两,几斤几两,白银价格换算,古今收入对比">
-    <meta name="author" content="几斤几两">
+    <title>${t.meta.title}</title>
+    <meta name="description" content="${descriptionText}">
+    <meta name="keywords" content="${keywordsText}">
+    <meta name="author" content="${t.meta.siteName}">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://jjjl.lol/">
+    <link rel="canonical" href="${canonicalUrl}">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+    <!-- hreflang 标签 -->
+    <link rel="alternate" hreflang="zh-CN" href="https://jjjl.lol/">
+    <link rel="alternate" hreflang="zh-TW" href="https://jjjl.lol/zh-TW/">
+    <link rel="alternate" hreflang="x-default" href="https://jjjl.lol/">
 
     <!-- Open Graph (实时计算) -->
     <meta property="og:type" content="website">
-    <meta property="og:locale" content="zh_CN">
-    <meta property="og:site_name" content="几斤几两">
-    <meta property="og:title" content="几斤几两 | 你的月薪在明朝值多少两白银？">
-    <meta property="og:description" content="当前银价${price}元/克，月薪1万≈${liang10k}两白银≈明朝${rank10k.grade}${rank10k.position.split('、')[0]}">
-    <meta property="og:url" content="https://jjjl.lol/">
-    <meta property="og:image" content="https://jjjl.lol/og-image.svg">
+    <meta property="og:locale" content="${ogLocale}">
+    <meta property="og:locale:alternate" content="${ogLocale === 'zh_CN' ? 'zh_TW' : 'zh_CN'}">
+    <meta property="og:site_name" content="${t.meta.siteName}">
+    <meta property="og:title" content="${t.meta.ogTitle}">
+    <meta property="og:description" content="${ogDescText}">
+    <meta property="og:url" content="${canonicalUrl}">
+    <meta property="og:image" content="${ogImageUrl}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="几斤几两 - 月薪${Math.round(salary10k/1000)}k换算${liang10k}两白银，相当于明朝${rank10k.grade}">
+    <meta property="og:image:alt" content="${ogImageAlt}">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="几斤几两 | 你的月薪在明朝值多少两白银？">
-    <meta name="twitter:description" content="当前银价${price}元/克，月薪1万≈${liang10k}两白银≈明朝${rank10k.grade}">
-    <meta name="twitter:image" content="https://jjjl.lol/og-image.svg">
-    <meta name="twitter:image:alt" content="几斤几两 - 月薪换算白银工具">
+    <meta name="twitter:title" content="${t.meta.ogTitle}">
+    <meta name="twitter:description" content="${ogDescText}">
+    <meta name="twitter:image" content="${ogImageUrl}">
+    <meta name="twitter:image:alt" content="${twitterImageAlt}">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -311,10 +582,10 @@ function renderHTML(priceData) {
         "@graph": [
             {
                 "@type": "WebPage",
-                "name": "几斤几两 - 月薪换算白银",
-                "description": "将现代月薪换算成古代白银重量，匹配明朝官职等级",
-                "url": "https://jjjl.lol/",
-                "inLanguage": "zh-CN",
+                "name": "${locale === 'zh-TW' ? '幾斤幾兩 - 月薪換算白銀' : '几斤几两 - 月薪换算白银'}",
+                "description": "${locale === 'zh-TW' ? '將現代月薪換算成古代白銀重量，匹配明朝官職等級' : '将现代月薪换算成古代白银重量，匹配明朝官职等级'}",
+                "url": "${canonicalUrl}",
+                "inLanguage": "${htmlLang}",
                 "dateModified": "${today}",
                 "speakable": {
                     "@type": "SpeakableSpecification",
@@ -322,7 +593,7 @@ function renderHTML(priceData) {
                 },
                 "mainEntity": {
                     "@type": "SoftwareApplication",
-                    "name": "几斤几两 - 俸禄换算器",
+                    "name": "${locale === 'zh-TW' ? '幾斤幾兩 - 俸祿換算器' : '几斤几两 - 俸禄换算器'}",
                     "applicationCategory": "UtilityApplication",
                     "operatingSystem": "Any",
                     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
@@ -333,26 +604,30 @@ function renderHTML(priceData) {
                 "mainEntity": [
                     {
                         "@type": "Question",
-                        "name": "月薪1万元相当于多少两白银？",
+                        "name": "${locale === 'zh-TW' ? '月薪1萬元相當於多少兩白銀？' : '月薪1万元相当于多少两白银？'}",
                         "acceptedAnswer": {
                             "@type": "Answer",
-                            "text": "按照当前白银价格（${price}元/克）计算，月薪1万元约等于${liang10k}两白银。根据明朝俸禄制度，这相当于${rank10k.grade}${rank10k.position.split('、')[0]}的月俸（${rank10k.monthlyLiang}两）。"
+                            "text": "${locale === 'zh-TW'
+                                ? `按照當前白銀價格（${price}元/克）計算，月薪1萬元約等於${liang10k}兩白銀。根據明朝俸祿制度，這相當於${rank10k.grade}${rank10k.position.split('、')[0]}的月俸（${rank10k.monthlyLiang}兩）。`
+                                : `按照当前白银价格（${price}元/克）计算，月薪1万元约等于${liang10k}两白银。根据明朝俸禄制度，这相当于${rank10k.grade}${rank10k.position.split('、')[0]}的月俸（${rank10k.monthlyLiang}两）。`}"
                         }
                     },
                     {
                         "@type": "Question",
-                        "name": "古代一两银子等于多少克？",
+                        "name": "${locale === 'zh-TW' ? '古代一兩銀子等於多少克？' : '古代一两银子等于多少克？'}",
                         "acceptedAnswer": {
                             "@type": "Answer",
-                            "text": "根据明清标准，1两银子约等于37.3克。古代使用十六两制，即1斤=16两≈596.8克。"
+                            "text": "${locale === 'zh-TW' ? '根據明清標準，1兩銀子約等於37.3克。古代使用十六兩制，即1斤=16兩≈596.8克。' : '根据明清标准，1两银子约等于37.3克。古代使用十六两制，即1斤=16两≈596.8克。'}"
                         }
                     },
                     {
                         "@type": "Question",
-                        "name": "明朝各品级官员月俸是多少？",
+                        "name": "${locale === 'zh-TW' ? '明朝各品級官員月俸是多少？' : '明朝各品级官员月俸是多少？'}",
                         "acceptedAnswer": {
                             "@type": "Answer",
-                            "text": "明朝官员俸禄从正一品太师月俸87两，到从九品驿丞月俸5两不等。正七品县令月俸约7.5两，按当前银价折算约${salary7.toLocaleString()}元。"
+                            "text": "${locale === 'zh-TW'
+                                ? `明朝官員俸祿從正一品太師月俸87兩，到從九品驛丞月俸5兩不等。正七品縣令月俸約7.5兩，按當前銀價折算約${salary7.toLocaleString()}元。`
+                                : `明朝官员俸禄从正一品太师月俸87两，到从九品驿丞月俸5两不等。正七品县令月俸约7.5两，按当前银价折算约${salary7.toLocaleString()}元。`}"
                         }
                     }
                 ]
@@ -439,27 +714,35 @@ function renderHTML(priceData) {
     <div class="fixed bottom-0 -left-32 w-80 h-80 bg-vermilion/5 rounded-full blur-[80px] pointer-events-none"></div>
 
     <main class="relative z-10 max-w-2xl mx-auto px-4 py-10 md:py-16">
+        <!-- 语言切换器 -->
+        <div class="absolute top-4 right-4 z-20">
+            <a href="${t.ui.langSwitcherUrl}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-paper-200/80 hover:bg-paper-300 border border-paper-300 rounded-full text-xs text-ink-600 hover:text-ink-800 transition-colors backdrop-blur-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                ${t.ui.langSwitcher}
+            </a>
+        </div>
+
         <header class="text-center mb-12 animate-fadeUp">
-            <div class="inline-flex items-center justify-center w-12 h-12 bg-vermilion text-paper-100 font-brush text-2xl rounded shadow-md rotate-[-3deg] mb-4 animate-stamp">俸</div>
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-vermilion text-paper-100 font-brush text-2xl rounded shadow-md rotate-[-3deg] mb-4 animate-stamp">${t.ui.header}</div>
             <h1 class="font-display text-3xl md:text-4xl tracking-wider text-ink-900 mb-2">
-                几斤几两<span class="text-ink-600 mx-1">｜</span><span class="text-ink-700">俸禄换算</span>
+                ${t.ui.mainTitle}<span class="text-ink-600 mx-1">｜</span><span class="text-ink-700">${t.ui.subTitle}</span>
             </h1>
-            <p class="text-ink-500 tracking-[0.3em] text-sm">以今度古，量你几何</p>
+            <p class="text-ink-500 tracking-[0.3em] text-sm">${t.ui.tagline}</p>
         </header>
 
         <section class="summary bg-paper-200/50 border border-paper-300 rounded-lg p-4 mb-8 text-sm text-ink-700 leading-relaxed animate-fadeUp">
-            <p><strong>月薪1万元 ≈ ${liang10k}两白银 ≈ 明朝${rank10k.grade}${rank10k.position.split('、')[0]}。</strong>基于<a href="https://goldprice.org" class="text-vermilion hover:underline" target="_blank" rel="noopener">GoldPrice.org</a>实时银价（${price}元/克），我们将你的月薪换算成古代白银重量，并参照《明史·职官志》匹配官职品级。</p>
+            <p><strong>${locale === 'zh-TW' ? `月薪1萬元 ≈ ${liang10k}兩白銀 ≈ 明朝${rank10k.grade}${rank10k.position.split('、')[0]}。` : `月薪1万元 ≈ ${liang10k}两白银 ≈ 明朝${rank10k.grade}${rank10k.position.split('、')[0]}。`}</strong>${locale === 'zh-TW' ? `基於<a href="https://goldprice.org" class="text-vermilion hover:underline" target="_blank" rel="noopener">GoldPrice.org</a>即時銀價（${price}元/克），我們將你的月薪換算成古代白銀重量，並參照《明史·職官志》匹配官職品級。` : `基于<a href="https://goldprice.org" class="text-vermilion hover:underline" target="_blank" rel="noopener">GoldPrice.org</a>实时银价（${price}元/克），我们将你的月薪换算成古代白银重量，并参照《明史·职官志》匹配官职品级。`}</p>
         </section>
 
         <div class="bg-gradient-to-br from-paper-200 to-paper-100 border border-paper-300 rounded-lg p-4 flex flex-wrap items-center gap-4 mb-8 animate-fadeUp delay-100">
             <div class="flex items-center gap-2 text-sm text-ink-600">
-                <span class="w-2 h-2 bg-vermilion rounded-full animate-pulse"></span>今日银价
+                <span class="w-2 h-2 bg-vermilion rounded-full animate-pulse"></span>${t.ui.silverPrice}
             </div>
             <div class="flex items-baseline gap-1">
                 <span id="silverPrice" class="font-display text-2xl text-ink-900">${price.toFixed(2)}</span>
-                <span class="text-ink-600 text-sm">元/克</span>
+                <span class="text-ink-600 text-sm">${t.ui.priceUnit}</span>
             </div>
-            <span id="priceNote" class="text-xs text-ink-500 ml-auto">来源: ${source}</span>
+            <span id="priceNote" class="text-xs text-ink-500 ml-auto">${t.ui.source}: ${source}</span>
         </div>
 
         <section class="relative border-2 border-ink-600 p-6 md:p-8 bg-paper-100 mb-10 animate-fadeUp delay-200">
@@ -469,8 +752,8 @@ function renderHTML(priceData) {
             <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 border-r-[3px] border-b-[3px] border-ink-900"></div>
             <div class="flex flex-col items-center gap-6">
                 <label class="text-center" for="salaryInput">
-                    <span class="font-display text-xl tracking-[0.2em] text-ink-800">请书月俸</span>
-                    <span class="block text-xs text-ink-500 mt-1">（单位：人民币元）</span>
+                    <span class="font-display text-xl tracking-[0.2em] text-ink-800">${t.ui.inputLabel}</span>
+                    <span class="block text-xs text-ink-500 mt-1">${t.ui.inputHint}</span>
                 </label>
                 <div class="flex items-center gap-2 bg-paper-200 border border-paper-300 border-b-2 border-b-ink-600 px-4 py-2 focus-within:border-b-vermilion focus-within:bg-paper-100 transition-colors">
                     <span class="font-display text-2xl text-ink-600">￥</span>
@@ -478,7 +761,7 @@ function renderHTML(priceData) {
                 </div>
                 <button id="calculateBtn" type="button" class="group relative px-8 py-3 bg-ink-800 text-paper-100 font-song overflow-hidden hover:-translate-y-0.5 hover:shadow-lg transition-all">
                     <span class="absolute inset-0 bg-vermilion -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></span>
-                    <span class="relative flex items-center gap-2">开卷验算
+                    <span class="relative flex items-center gap-2">${t.ui.calculate}
                         <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </span>
                 </button>
@@ -488,22 +771,22 @@ function renderHTML(priceData) {
         <section id="resultSection" class="hidden mb-10">
             <div class="bg-gradient-to-b from-paper-200 via-paper-100 to-paper-200 border border-paper-300 border-t-4 border-b-4 border-t-ink-800 border-b-ink-800">
                 <div class="text-center py-4 border-b border-dashed border-paper-400">
-                    <h2 class="font-display text-ink-700 tracking-[0.3em]">换算明细</h2>
+                    <h2 class="font-display text-ink-700 tracking-[0.3em]">${t.ui.resultTitle}</h2>
                 </div>
                 <div class="p-6 space-y-6">
                     <div class="text-center pb-6 border-b border-dashed border-paper-300">
-                        <div class="text-sm text-ink-500 mb-2">折合白银</div>
+                        <div class="text-sm text-ink-500 mb-2">${t.ui.silverLabel}</div>
                         <div class="flex items-baseline justify-center gap-1 mb-1">
                             <span id="silverLiang" class="font-brush text-5xl text-ink-900">--</span>
-                            <span class="font-display text-xl text-ink-700">两</span>
+                            <span class="font-display text-xl text-ink-700">${t.ui.liang}</span>
                             <span id="silverQian" class="font-brush text-3xl text-ink-900 ml-2">--</span>
-                            <span class="font-display text-lg text-ink-700">钱</span>
+                            <span class="font-display text-lg text-ink-700">${t.ui.qian}</span>
                         </div>
-                        <div class="text-sm text-ink-500">约 <span id="silverGram">--</span> 克</div>
+                        <div class="text-sm text-ink-500">${locale === 'zh-TW' ? '約' : '约'} <span id="silverGram">--</span> ${t.ui.gram}</div>
                     </div>
                     <div class="flex flex-col md:flex-row items-center gap-6 p-4 bg-vermilion/5 border border-vermilion/10 rounded">
                         <div id="rankSeal" class="w-20 h-20 bg-vermilion rounded shadow-md flex items-center justify-center rotate-[-5deg]">
-                            <span id="rankText" class="font-brush text-4xl text-paper-100">品</span>
+                            <span id="rankText" class="font-brush text-4xl text-paper-100">${locale === 'zh-TW' ? '品' : '品'}</span>
                         </div>
                         <div class="text-center md:text-left flex-1">
                             <div id="rankTitle" class="text-sm text-vermilion tracking-wider mb-1">--</div>
@@ -512,12 +795,12 @@ function renderHTML(priceData) {
                         </div>
                     </div>
                     <div class="bg-paper-200 p-3 text-xs space-y-1">
-                        <div class="flex justify-between"><span class="text-ink-500">换算公式</span><span id="formula" class="text-ink-700">--</span></div>
-                        <div class="flex justify-between border-t border-dotted border-paper-300 pt-1"><span class="text-ink-500">古制换算</span><span class="text-ink-700">1两 ≈ 37.3克，16两 = 1斤</span></div>
+                        <div class="flex justify-between"><span class="text-ink-500">${t.ui.formula}</span><span id="formula" class="text-ink-700">--</span></div>
+                        <div class="flex justify-between border-t border-dotted border-paper-300 pt-1"><span class="text-ink-500">${t.ui.ancientUnit}</span><span class="text-ink-700">${t.ui.ancientUnitValue}</span></div>
                     </div>
                     <button id="sharePosterBtn" type="button" class="w-full mt-4 py-3 bg-vermilion text-paper-100 font-song rounded hover:bg-vermilion-dark transition-colors flex items-center justify-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        生成分享海报
+                        ${t.ui.sharePoster}
                     </button>
                 </div>
             </div>
@@ -529,7 +812,7 @@ function renderHTML(priceData) {
             <div class="relative flex flex-col h-full max-h-screen p-3 sm:p-4">
                 <!-- 顶部栏 -->
                 <div class="flex items-center justify-between py-2 mb-2 flex-shrink-0">
-                    <h3 class="font-display text-base text-paper-200 tracking-wider">分享海报</h3>
+                    <h3 class="font-display text-base text-paper-200 tracking-wider">${t.ui.posterTitle}</h3>
                     <button onclick="closePosterModal()" class="text-paper-300 hover:text-paper-100 transition-colors p-1">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
@@ -538,13 +821,13 @@ function renderHTML(priceData) {
                 <div class="flex-1 flex items-center justify-center min-h-0 mb-3">
                     <div class="relative h-full max-h-full" style="aspect-ratio: 9/16; max-width: 100%;">
                         <canvas id="posterCanvas" class="h-full w-auto rounded-lg shadow-2xl hidden"></canvas>
-                        <img id="posterImage" class="h-full w-auto rounded-lg shadow-2xl" style="max-height: 100%;" alt="分享海报">
+                        <img id="posterImage" class="h-full w-auto rounded-lg shadow-2xl" style="max-height: 100%;" alt="${t.ui.posterTitle}">
                         <!-- 古风 Loading -->
                         <div id="posterLoading" class="absolute inset-0 flex flex-col items-center justify-center bg-paper-200 rounded-lg">
                             <div class="seal-loading">
                                 <div class="seal-stamp"></div>
                             </div>
-                            <p class="mt-4 text-ink-600 font-display tracking-widest text-sm">文牒生成中</p>
+                            <p class="mt-4 text-ink-600 font-display tracking-widest text-sm">${t.ui.posterLoading}</p>
                             <div class="loading-dots mt-2">
                                 <span></span><span></span><span></span>
                             </div>
@@ -557,11 +840,11 @@ function renderHTML(priceData) {
                     <div id="posterBtns" class="flex gap-3">
                         <button id="downloadPosterBtn" class="flex-1 py-3 bg-ink-800 text-paper-100 font-song rounded-lg hover:bg-ink-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                            保存图片
+                            ${t.ui.saveImage}
                         </button>
                         <button id="shareBtn" class="flex-1 py-3 bg-vermilion text-paper-100 font-song rounded-lg hover:bg-vermilion-dark active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
-                            <span id="shareBtnText">分享</span>
+                            <span id="shareBtnText">${t.ui.share}</span>
                         </button>
                     </div>
                 </div>
@@ -570,17 +853,17 @@ function renderHTML(priceData) {
 
         <section class="animate-fadeUp delay-300">
             <div class="text-center mb-6">
-                <h2 class="font-display text-xl tracking-[0.2em] text-ink-800 mb-1">明朝俸禄品级表</h2>
-                <p class="text-xs text-ink-500">以下数据基于明朝官制，1石米约折银1两</p>
+                <h2 class="font-display text-xl tracking-[0.2em] text-ink-800 mb-1">${t.ui.tableTitle}</h2>
+                <p class="text-xs text-ink-500">${t.ui.tableHint}</p>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-paper-200 sticky top-0">
                         <tr>
-                            <th class="font-display font-normal text-ink-700 text-left px-3 py-2">品级</th>
-                            <th class="font-display font-normal text-ink-700 text-left px-3 py-2">官职</th>
-                            <th class="font-display font-normal text-ink-700 text-left px-3 py-2">月俸(两)</th>
-                            <th class="font-display font-normal text-ink-700 text-left px-3 py-2">今折(元)</th>
+                            <th class="font-display font-normal text-ink-700 text-left px-3 py-2">${t.ui.colGrade}</th>
+                            <th class="font-display font-normal text-ink-700 text-left px-3 py-2">${t.ui.colPosition}</th>
+                            <th class="font-display font-normal text-ink-700 text-left px-3 py-2">${t.ui.colSalary}</th>
+                            <th class="font-display font-normal text-ink-700 text-left px-3 py-2">${t.ui.colModern}</th>
                         </tr>
                     </thead>
                     <tbody id="rankTableBody" class="divide-y divide-paper-300">${tableRows}</tbody>
@@ -589,43 +872,46 @@ function renderHTML(priceData) {
         </section>
 
         <section class="mt-12 space-y-4 animate-fadeUp">
-            <h2 class="font-display text-lg tracking-[0.15em] text-ink-800 text-center mb-6">常见问题</h2>
+            <h2 class="font-display text-lg tracking-[0.15em] text-ink-800 text-center mb-6">${t.ui.faqTitle}</h2>
             <details class="bg-paper-200/50 border border-paper-300 rounded-lg">
-                <summary class="px-4 py-3 cursor-pointer text-ink-800 font-medium hover:bg-paper-200 transition-colors">月薪1万元相当于多少两白银？</summary>
+                <summary class="px-4 py-3 cursor-pointer text-ink-800 font-medium hover:bg-paper-200 transition-colors">${t.faq[0].q}</summary>
                 <div class="faq-answer px-4 pb-4 text-sm text-ink-600 leading-relaxed">
-                    <p>根据<a href="https://goldprice.org" class="text-vermilion hover:underline" target="_blank" rel="noopener">GoldPrice.org</a>实时数据，当前白银价格为<strong>${price}元/克</strong>，月薪1万元约等于<strong>${liang10k}两白银</strong>。参照《明史·职官志》记载的俸禄制度，这相当于${rank10k.grade}${rank10k.position.split('、')[0]}的月俸（${rank10k.monthlyLiang}两），是「${rank10k.description.split('。')[0]}」。</p>
+                    <p>${t.faq[0].a(price, liang10k, rank10k, salary7)}</p>
                 </div>
             </details>
             <details class="bg-paper-200/50 border border-paper-300 rounded-lg">
-                <summary class="px-4 py-3 cursor-pointer text-ink-800 font-medium hover:bg-paper-200 transition-colors">古代一两银子等于多少克？</summary>
+                <summary class="px-4 py-3 cursor-pointer text-ink-800 font-medium hover:bg-paper-200 transition-colors">${t.faq[1].q}</summary>
                 <div class="faq-answer px-4 pb-4 text-sm text-ink-600 leading-relaxed">
-                    <p>根据《清会典》和明清度量衡研究，<strong>1两银子约等于37.3克</strong>（库平两标准）。古代使用十六两制，即1斤=16两≈596.8克。换算公式：白银克数 = 月薪(元) ÷ 银价(元/克)。</p>
+                    <p>${t.faq[1].a(price, liang10k, rank10k, salary7)}</p>
                 </div>
             </details>
             <details class="bg-paper-200/50 border border-paper-300 rounded-lg">
-                <summary class="px-4 py-3 cursor-pointer text-ink-800 font-medium hover:bg-paper-200 transition-colors">明朝各品级官员月俸是多少？</summary>
+                <summary class="px-4 py-3 cursor-pointer text-ink-800 font-medium hover:bg-paper-200 transition-colors">${t.faq[2].q}</summary>
                 <div class="faq-answer px-4 pb-4 text-sm text-ink-600 leading-relaxed">
-                    <p>据《明史·食货志》记载，明朝官员俸禄从<strong>正一品太师年俸1044石（月俸87两）</strong>，到<strong>从九品驿丞年俸60石（月俸5两）</strong>不等。正七品县令月俸约7.5两，按当前银价折算约<strong>${salary7.toLocaleString()}元</strong>。未入流小吏月俸约3两，平民农户约1-2两。</p>
+                    <p>${t.faq[2].a(price, liang10k, rank10k, salary7)}</p>
                 </div>
             </details>
             <details class="bg-paper-200/50 border border-paper-300 rounded-lg">
-                <summary class="px-4 py-3 cursor-pointer text-ink-800 font-medium hover:bg-paper-200 transition-colors">这个工具的换算公式是什么？</summary>
+                <summary class="px-4 py-3 cursor-pointer text-ink-800 font-medium hover:bg-paper-200 transition-colors">${t.faq[3].q}</summary>
                 <div class="faq-answer px-4 pb-4 text-sm text-ink-600 leading-relaxed">
-                    <p>换算公式为：<strong>白银克数 = 月薪(元) ÷ 当前银价(元/克)</strong>，然后按明清库平两标准转换：1两=37.3克，1两=10钱。例如月薪10000元，银价${price}元/克，得到${Math.round(salary10k/price)}克，约<strong>${example.liang}两${example.qian}钱</strong>白银。</p>
+                    <p>${t.faq[3].a(price, liang10k, rank10k, salary7, example)}</p>
                 </div>
             </details>
         </section>
 
         <footer class="text-center mt-16 pt-8 border-t border-paper-300">
-            <p class="text-xs text-ink-500 mb-2">本站仅供娱乐参考，历史数据取自明朝官制</p>
-            <p class="font-display text-sm text-ink-600 tracking-[0.2em]">古今一算，方知斤两</p>
+            <p class="text-xs text-ink-500 mb-2">${t.ui.footer1}</p>
+            <p class="font-display text-sm text-ink-600 tracking-[0.2em]">${t.ui.footer2}</p>
         </footer>
     </main>
 
     <script>
         const CURRENT_PRICE = ${price};
+        const CURRENT_LOCALE = '${locale}';
         const CONVERSION = ${JSON.stringify(CONVERSION)};
-        const RANK_DATA = ${JSON.stringify(RANK_DATA)};
+        const RANK_DATA = ${JSON.stringify(ranks)};
+        const UI_TEXTS = ${JSON.stringify(t.ui)};
+        const FUN_TEXTS = ${JSON.stringify(t.funText)};
 
         function matchRank(monthlyLiang) {
             for (const rank of RANK_DATA) {
@@ -705,19 +991,19 @@ function renderHTML(priceData) {
 
             if (isWeChat) {
                 // 微信环境：隐藏下载按钮，提示长按保存
-                saveHint.textContent = '👆 长按上方图片保存到相册';
+                saveHint.textContent = UI_TEXTS.wechatSaveHint;
                 downloadBtn.classList.add('hidden');
                 shareBtn.classList.remove('flex-1');
                 shareBtn.classList.add('w-full');
-                shareBtnText.textContent = '复制分享文案';
+                shareBtnText.textContent = UI_TEXTS.copyText;
             } else if (isMobile) {
                 // 其他移动端
-                saveHint.textContent = '📱 长按图片保存，或点击按钮操作';
-                shareBtnText.textContent = '分享';
+                saveHint.textContent = UI_TEXTS.mobileSaveHint;
+                shareBtnText.textContent = UI_TEXTS.share;
             } else {
                 // 桌面端
                 saveHint.textContent = '';
-                shareBtnText.textContent = '分享';
+                shareBtnText.textContent = UI_TEXTS.share;
             }
 
             generatePoster(currentPosterData);
@@ -788,12 +1074,12 @@ function renderHTML(priceData) {
             ctx.fillStyle = '#8a7a66';
             ctx.font = '14px ' + FONT_BODY;
             ctx.textAlign = 'center';
-            ctx.fillText('大明王朝', W/2, 65);
+            ctx.fillText(UI_TEXTS.dynasty, W/2, 65);
 
             // 主标题
             ctx.fillStyle = '#1a1612';
             ctx.font = 'bold 52px ' + FONT_BRUSH;
-            ctx.fillText('身份文牒', W/2, 120);
+            ctx.fillText(UI_TEXTS.docTitle, W/2, 120);
 
             // 标题装饰线
             ctx.strokeStyle = '#c73e3a';
@@ -883,21 +1169,23 @@ function renderHTML(priceData) {
             // 月俸标签
             ctx.fillStyle = '#8a7a66';
             ctx.font = '14px ' + FONT_BODY;
-            ctx.fillText('月俸白银', W/2, boxY + 30);
+            ctx.fillText(UI_TEXTS.monthlySalary, W/2, boxY + 30);
 
             // 银两数字（核心数据，要大）
-            const liangText = data.qian > 0 ? data.liang + ' 两 ' + data.qian + ' 钱' : data.liang + ' 两';
+            const liangText = data.qian > 0 ? data.liang + ' ' + UI_TEXTS.liang + ' ' + data.qian + ' ' + UI_TEXTS.qian : data.liang + ' ' + UI_TEXTS.liang;
             ctx.fillStyle = '#1a1612';
             ctx.font = 'bold 44px ' + FONT_BRUSH;
             ctx.fillText(liangText, W/2, boxY + 78);
 
             // 今薪换算
+            const wanChar = CURRENT_LOCALE === 'zh-TW' ? '萬' : '万';
             const salaryText = data.salary >= 10000
-                ? '≈ 今 ¥' + (data.salary / 10000).toFixed(data.salary % 10000 === 0 ? 0 : 1) + '万'
+                ? '≈ 今 ¥' + (data.salary / 10000).toFixed(data.salary % 10000 === 0 ? 0 : 1) + wanChar
                 : '≈ 今 ¥' + data.salary.toLocaleString();
+            const priceLabel = CURRENT_LOCALE === 'zh-TW' ? '銀價' : '银价';
             ctx.fillStyle = '#6b6358';
             ctx.font = '15px ' + FONT_BODY;
-            ctx.fillText(salaryText + '  ·  银价 ¥' + data.price.toFixed(2) + '/克', W/2, boxY + 105);
+            ctx.fillText(salaryText + '  ·  ' + priceLabel + ' ¥' + data.price.toFixed(2) + '/克', W/2, boxY + 105);
 
             // ==================== 趣味评语 ====================
             const funText = getFunText(data.rank.grade, data.liang);
@@ -933,7 +1221,7 @@ function renderHTML(priceData) {
             // 底部提示
             ctx.fillStyle = '#8a7a66';
             ctx.font = '13px ' + FONT_BODY;
-            ctx.fillText('扫码测你几斤几两', W/2, 900);
+            ctx.fillText(UI_TEXTS.scanQR, W/2, 900);
 
             // ==================== 转换为图片 ====================
             const posterImage = document.getElementById('posterImage');
@@ -964,14 +1252,14 @@ function renderHTML(priceData) {
 
         // 趣味文案
         function getFunText(grade, liang) {
-            if (grade.includes('一品') || grade.includes('二品')) return '✦ 位极人臣 · 羡煞旁人 ✦';
-            if (grade.includes('三品') || grade.includes('四品')) return '✦ 封疆大吏 · 前途无量 ✦';
-            if (grade.includes('五品') || grade.includes('六品')) return '✦ 朝廷命官 · 光宗耀祖 ✦';
-            if (grade.includes('七品') || grade.includes('八品')) return '✦ 芝麻小官 · 也是官身 ✦';
-            if (grade.includes('九品') || grade === '未入流') return '✦ 虽是末吏 · 胜于白丁 ✦';
-            if (liang >= 1.5) return '✦ 家有薄产 · 小康人家 ✦';
-            if (liang >= 0.5) return '✦ 勤劳耕作 · 自食其力 ✦';
-            return '✦ 穿越需谨慎 · 搬砖保平安 ✦';
+            if (grade.includes('一品') || grade.includes('二品')) return FUN_TEXTS.top;
+            if (grade.includes('三品') || grade.includes('四品')) return FUN_TEXTS.high;
+            if (grade.includes('五品') || grade.includes('六品')) return FUN_TEXTS.mid;
+            if (grade.includes('七品') || grade.includes('八品')) return FUN_TEXTS.low;
+            if (grade.includes('九品') || grade === '未入流') return FUN_TEXTS.bottom;
+            if (liang >= 1.5) return FUN_TEXTS.farmer;
+            if (liang >= 0.5) return FUN_TEXTS.worker;
+            return FUN_TEXTS.poor;
         }
 
         // 绘制圆角矩形
@@ -1017,7 +1305,8 @@ function renderHTML(priceData) {
         function downloadPoster() {
             const canvas = document.getElementById('posterCanvas');
             const link = document.createElement('a');
-            link.download = '几斤几两-' + currentPosterData.salary + '元.png';
+            const fileName = CURRENT_LOCALE === 'zh-TW' ? '幾斤幾兩-' : '几斤几两-';
+            link.download = fileName + currentPosterData.salary + '元.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
         }
@@ -1028,7 +1317,10 @@ function renderHTML(priceData) {
             const shareBtnText = document.getElementById('shareBtnText');
             const originalText = shareBtnText.textContent;
 
-            const shareText = '我在明朝是【' + currentPosterData.rank.grade + ' · ' + currentPosterData.rank.position.split('、')[0] + '】！月俸' + currentPosterData.liang + '两白银。来测测你是几斤几两？ jjjl.lol';
+            const shareTextTemplate = CURRENT_LOCALE === 'zh-TW'
+                ? '我在明朝是【' + currentPosterData.rank.grade + ' · ' + currentPosterData.rank.position.split('、')[0] + '】！月俸' + currentPosterData.liang + '兩白銀。來測測你是幾斤幾兩？ jjjl.lol/zh-TW/'
+                : '我在明朝是【' + currentPosterData.rank.grade + ' · ' + currentPosterData.rank.position.split('、')[0] + '】！月俸' + currentPosterData.liang + '两白银。来测测你是几斤几两？ jjjl.lol';
+            const shareText = shareTextTemplate;
 
             // 微信环境或不支持 Web Share，直接复制文案
             if (isWeChat) {
@@ -1045,11 +1337,15 @@ function renderHTML(priceData) {
             if (navigator.share && navigator.canShare) {
                 try {
                     const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-                    const file = new File([blob], '几斤几两.png', { type: 'image/png' });
+                    const fileName = CURRENT_LOCALE === 'zh-TW' ? '幾斤幾兩.png' : '几斤几两.png';
+                    const file = new File([blob], fileName, { type: 'image/png' });
 
                     if (navigator.canShare({ files: [file] })) {
+                        const shareTitle = CURRENT_LOCALE === 'zh-TW'
+                            ? '我在明朝是' + currentPosterData.rank.grade
+                            : '我在明朝是' + currentPosterData.rank.grade;
                         await navigator.share({
-                            title: '我在明朝是' + currentPosterData.rank.grade,
+                            title: shareTitle,
                             text: shareText,
                             files: [file]
                         });
@@ -1063,10 +1359,12 @@ function renderHTML(priceData) {
             // 尝试分享链接
             if (navigator.share) {
                 try {
+                    const shareTitle = CURRENT_LOCALE === 'zh-TW' ? '幾斤幾兩 - 月薪換算白銀' : '几斤几两 - 月薪换算白银';
+                    const shareUrl = CURRENT_LOCALE === 'zh-TW' ? 'https://jjjl.lol/zh-TW/' : 'https://jjjl.lol';
                     await navigator.share({
-                        title: '几斤几两 - 月薪换算白银',
+                        title: shareTitle,
                         text: shareText,
-                        url: 'https://jjjl.lol'
+                        url: shareUrl
                     });
                     return;
                 } catch (err) {
@@ -1083,7 +1381,7 @@ function renderHTML(priceData) {
             }
 
             function showCopied() {
-                shareBtnText.textContent = '已复制 ✓';
+                shareBtnText.textContent = UI_TEXTS.copied;
                 shareBtn.classList.add('bg-green-600');
                 shareBtn.classList.remove('bg-vermilion', 'hover:bg-vermilion-dark');
                 setTimeout(() => {

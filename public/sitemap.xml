@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://jjjl.lol/</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://jjjl.lol/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://jjjl.lol/zh-TW/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jjjl.lol/"/>
+    <lastmod>2026-01-30</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://jjjl.lol/zh-TW/</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://jjjl.lol/"/>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://jjjl.lol/zh-TW/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://jjjl.lol/"/>
     <lastmod>2026-01-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
