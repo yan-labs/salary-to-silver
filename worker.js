@@ -375,6 +375,37 @@ function renderHTML(priceData) {
         .delay-100 { animation-delay: 0.1s; }
         .delay-200 { animation-delay: 0.2s; }
         .delay-300 { animation-delay: 0.3s; }
+        @keyframes modalIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes backdropIn { from { opacity:0; } to { opacity:1; } }
+        .animate-modalIn { animation: modalIn 0.3s ease-out both; }
+        .animate-backdropIn { animation: backdropIn 0.2s ease-out both; }
+        /* 印章盖章 loading 动画 */
+        @keyframes sealStamp {
+            0% { transform: translateY(-30px) rotate(-8deg) scale(1.1); opacity: 0; }
+            50% { transform: translateY(0) rotate(-8deg) scale(0.95); opacity: 1; }
+            60% { transform: translateY(0) rotate(-8deg) scale(1); }
+            100% { transform: translateY(0) rotate(-8deg) scale(1); opacity: 0.6; }
+        }
+        @keyframes sealGlow { 0%, 100% { box-shadow: 0 0 0 rgba(199,62,58,0); } 50% { box-shadow: 0 0 20px rgba(199,62,58,0.4); } }
+        .seal-loading { position: relative; width: 70px; height: 70px; }
+        .seal-stamp {
+            width: 70px; height: 70px; background: #c73e3a; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            animation: sealStamp 1.5s ease-in-out infinite, sealGlow 1.5s ease-in-out infinite;
+            transform: rotate(-8deg);
+        }
+        .seal-stamp::after {
+            content: '印'; color: #f4ede4; font-size: 36px;
+            font-family: "STXingkai", "Xingkai SC", "华文行楷", "KaiTi", cursive; font-weight: bold;
+        }
+        @keyframes dotPulse { 0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); } 40% { opacity: 1; transform: scale(1); } }
+        .loading-dots { display: flex; gap: 6px; }
+        .loading-dots span {
+            width: 6px; height: 6px; background: #c73e3a; border-radius: 50%;
+            animation: dotPulse 1.2s ease-in-out infinite;
+        }
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
         #rankTableBody tr { transition: background 0.2s; }
         #rankTableBody tr:hover { background: rgba(199,62,58,0.05); }
         #rankTableBody tr.highlight { background: rgba(199,62,58,0.12); }
@@ -484,9 +515,58 @@ function renderHTML(priceData) {
                         <div class="flex justify-between"><span class="text-ink-500">换算公式</span><span id="formula" class="text-ink-700">--</span></div>
                         <div class="flex justify-between border-t border-dotted border-paper-300 pt-1"><span class="text-ink-500">古制换算</span><span class="text-ink-700">1两 ≈ 37.3克，16两 = 1斤</span></div>
                     </div>
+                    <button id="sharePosterBtn" type="button" class="w-full mt-4 py-3 bg-vermilion text-paper-100 font-song rounded hover:bg-vermilion-dark transition-colors flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        生成分享海报
+                    </button>
                 </div>
             </div>
         </section>
+
+        <!-- 海报弹窗 -->
+        <div id="posterModal" class="fixed inset-0 z-50 hidden">
+            <div class="absolute inset-0 bg-ink-900/80 backdrop-blur-sm animate-backdropIn" onclick="closePosterModal()"></div>
+            <div class="relative flex flex-col h-full max-h-screen p-3 sm:p-4">
+                <!-- 顶部栏 -->
+                <div class="flex items-center justify-between py-2 mb-2 flex-shrink-0">
+                    <h3 class="font-display text-base text-paper-200 tracking-wider">分享海报</h3>
+                    <button onclick="closePosterModal()" class="text-paper-300 hover:text-paper-100 transition-colors p-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <!-- 海报预览区 - 自适应高度 -->
+                <div class="flex-1 flex items-center justify-center min-h-0 mb-3">
+                    <div class="relative h-full max-h-full" style="aspect-ratio: 9/16; max-width: 100%;">
+                        <canvas id="posterCanvas" class="h-full w-auto rounded-lg shadow-2xl hidden"></canvas>
+                        <img id="posterImage" class="h-full w-auto rounded-lg shadow-2xl" style="max-height: 100%;" alt="分享海报">
+                        <!-- 古风 Loading -->
+                        <div id="posterLoading" class="absolute inset-0 flex flex-col items-center justify-center bg-paper-200 rounded-lg">
+                            <div class="seal-loading">
+                                <div class="seal-stamp"></div>
+                            </div>
+                            <p class="mt-4 text-ink-600 font-display tracking-widest text-sm">文牒生成中</p>
+                            <div class="loading-dots mt-2">
+                                <span></span><span></span><span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 底部操作区 - 固定 -->
+                <div class="flex-shrink-0 bg-paper-100 rounded-lg p-4 animate-modalIn">
+                    <p id="saveHint" class="text-sm text-vermilion text-center mb-3 font-medium"></p>
+                    <div id="posterBtns" class="flex gap-3">
+                        <button id="downloadPosterBtn" class="flex-1 py-3 bg-ink-800 text-paper-100 font-song rounded-lg hover:bg-ink-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            保存图片
+                        </button>
+                        <button id="shareBtn" class="flex-1 py-3 bg-vermilion text-paper-100 font-song rounded-lg hover:bg-vermilion-dark active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                            <span id="shareBtnText">分享</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <section class="animate-fadeUp delay-300">
             <div class="text-center mb-6">
@@ -589,6 +669,453 @@ function renderHTML(priceData) {
 
             setTimeout(() => document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
         }
+
+        // ============ 海报生成功能 ============
+        let currentPosterData = null;
+
+        document.getElementById('sharePosterBtn').addEventListener('click', openPosterModal);
+        document.getElementById('downloadPosterBtn').addEventListener('click', downloadPoster);
+        document.getElementById('shareBtn').addEventListener('click', sharePoster);
+
+        // 检测微信环境
+        const isWeChat = /MicroMessenger/i.test(navigator.userAgent);
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+        function openPosterModal() {
+            const salary = parseFloat(document.getElementById('salaryInput').value);
+            if (!salary) return;
+
+            const gram = salary / CURRENT_PRICE;
+            const { liang, qian } = gramToLiangQian(gram);
+            const rank = matchRank(gram / CONVERSION.GRAM_PER_LIANG);
+
+            currentPosterData = { salary, gram, liang, qian, rank, price: CURRENT_PRICE };
+
+            document.getElementById('posterModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('posterLoading').classList.remove('hidden');
+            document.getElementById('posterImage').classList.add('hidden');
+
+            // 根据环境调整 UI
+            const saveHint = document.getElementById('saveHint');
+            const downloadBtn = document.getElementById('downloadPosterBtn');
+            const shareBtn = document.getElementById('shareBtn');
+            const shareBtnText = document.getElementById('shareBtnText');
+
+            if (isWeChat) {
+                // 微信环境：隐藏下载按钮，提示长按保存
+                saveHint.textContent = '👆 长按上方图片保存到相册';
+                downloadBtn.classList.add('hidden');
+                shareBtn.classList.remove('flex-1');
+                shareBtn.classList.add('w-full');
+                shareBtnText.textContent = '复制分享文案';
+            } else if (isMobile) {
+                // 其他移动端
+                saveHint.textContent = '📱 长按图片保存，或点击按钮操作';
+                shareBtnText.textContent = '分享';
+            } else {
+                // 桌面端
+                saveHint.textContent = '';
+                shareBtnText.textContent = '分享';
+            }
+
+            generatePoster(currentPosterData);
+        }
+
+        function closePosterModal() {
+            document.getElementById('posterModal').classList.add('hidden');
+            document.body.style.overflow = '';
+            // 重置按钮状态
+            const downloadBtn = document.getElementById('downloadPosterBtn');
+            const shareBtn = document.getElementById('shareBtn');
+            downloadBtn.classList.remove('hidden');
+            shareBtn.classList.remove('w-full');
+            shareBtn.classList.add('flex-1');
+        }
+
+        // 海报字体 - 仅使用系统字体
+        const FONT_BRUSH = '"STXingkai", "Xingkai SC", "华文行楷", "STKaiti", "Kaiti SC", "楷体-简", "楷体", "KaiTi", cursive';
+        const FONT_DISPLAY = '"STSong", "Songti SC", "华文宋体", "宋体", "SimSun", serif';
+        const FONT_BODY = '"STSong", "Songti SC", "华文宋体", "宋体", "SimSun", serif';
+
+        async function generatePoster(data) {
+            const canvas = document.getElementById('posterCanvas');
+            const ctx = canvas.getContext('2d');
+
+            const dpr = window.devicePixelRatio || 2;
+            const W = 540;
+            const H = 960;
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            canvas.style.width = W + 'px';
+            canvas.style.height = H + 'px';
+            ctx.scale(dpr, dpr);
+
+            // ==================== 背景层 ====================
+            // 古纸渐变
+            const bgGrad = ctx.createLinearGradient(0, 0, W * 0.3, H);
+            bgGrad.addColorStop(0, '#f7f0e3');
+            bgGrad.addColorStop(0.5, '#f0e6d3');
+            bgGrad.addColorStop(1, '#e8dcc6');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, W, H);
+
+            // 做旧斑点纹理
+            ctx.globalAlpha = 0.04;
+            for (let i = 0; i < 600; i++) {
+                ctx.fillStyle = Math.random() > 0.5 ? '#8B7355' : '#6B5344';
+                ctx.beginPath();
+                ctx.arc(Math.random() * W, Math.random() * H, Math.random() * 2 + 0.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+
+            // 边缘暗角
+            const vignette = ctx.createRadialGradient(W/2, H/2, H*0.25, W/2, H/2, H*0.65);
+            vignette.addColorStop(0, 'rgba(0,0,0,0)');
+            vignette.addColorStop(1, 'rgba(80,60,40,0.12)');
+            ctx.fillStyle = vignette;
+            ctx.fillRect(0, 0, W, H);
+
+            // ==================== 边框 - 通缉令风格 ====================
+            ctx.strokeStyle = '#2d2418';
+            ctx.lineWidth = 6;
+            ctx.strokeRect(18, 18, W - 36, H - 36);
+
+            // ==================== 顶部标题区 ====================
+            // 小标签
+            ctx.fillStyle = '#8a7a66';
+            ctx.font = '14px ' + FONT_BODY;
+            ctx.textAlign = 'center';
+            ctx.fillText('大明王朝', W/2, 65);
+
+            // 主标题
+            ctx.fillStyle = '#1a1612';
+            ctx.font = 'bold 52px ' + FONT_BRUSH;
+            ctx.fillText('身份文牒', W/2, 120);
+
+            // 标题装饰线
+            ctx.strokeStyle = '#c73e3a';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(W/2 - 100, 138);
+            ctx.lineTo(W/2 + 100, 138);
+            ctx.stroke();
+
+            // 装饰点
+            ctx.fillStyle = '#c73e3a';
+            ctx.beginPath();
+            ctx.arc(W/2 - 110, 138, 4, 0, Math.PI * 2);
+            ctx.arc(W/2 + 110, 138, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // ==================== 印章区（视觉焦点）====================
+            ctx.save();
+            ctx.translate(W/2, 255);
+            ctx.rotate(-8 * Math.PI / 180);
+
+            // 印章阴影
+            ctx.shadowColor = 'rgba(120, 40, 40, 0.4)';
+            ctx.shadowBlur = 20;
+            ctx.shadowOffsetX = 6;
+            ctx.shadowOffsetY = 6;
+
+            // 印章主体
+            const sealSize = 130;
+            ctx.fillStyle = '#c73e3a';
+            roundRect(ctx, -sealSize/2, -sealSize/2, sealSize, sealSize, 6);
+            ctx.fill();
+
+            // 印章内边框
+            ctx.shadowColor = 'transparent';
+            ctx.strokeStyle = '#f4ede4';
+            ctx.lineWidth = 3;
+            roundRect(ctx, -sealSize/2 + 8, -sealSize/2 + 8, sealSize - 16, sealSize - 16, 4);
+            ctx.stroke();
+
+            // 印章文字
+            ctx.fillStyle = '#f4ede4';
+            ctx.font = 'bold 88px ' + FONT_BRUSH;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(data.rank.sealChar, 0, -5);
+
+            ctx.restore();
+
+            // ==================== 品级信息（核心区）====================
+            // 品级大字
+            ctx.fillStyle = '#1a1612';
+            ctx.font = 'bold 58px ' + FONT_BRUSH;
+            ctx.textAlign = 'center';
+            ctx.fillText(data.rank.grade, W/2, 400);
+
+            // 官职
+            ctx.fillStyle = '#c73e3a';
+            ctx.font = '28px ' + FONT_DISPLAY;
+            ctx.fillText(data.rank.position.split('、')[0], W/2, 445);
+
+            // 描述文字（自动换行）
+            ctx.fillStyle = '#5a5046';
+            ctx.font = '16px ' + FONT_BODY;
+            const descText = '「' + data.rank.description.split('。')[0] + '」';
+            wrapText(ctx, descText, W/2, 490, 380, 26);
+
+            // ==================== 俸禄信息框 ====================
+            const boxX = 60;
+            const boxY = 545;
+            const boxW = W - 120;
+            const boxH = 120;
+
+            // 框背景
+            ctx.fillStyle = 'rgba(199, 62, 58, 0.06)';
+            roundRect(ctx, boxX, boxY, boxW, boxH, 8);
+            ctx.fill();
+
+            // 框边线
+            ctx.strokeStyle = '#c73e3a';
+            ctx.lineWidth = 1.5;
+            ctx.globalAlpha = 0.4;
+            roundRect(ctx, boxX, boxY, boxW, boxH, 8);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+
+            // 月俸标签
+            ctx.fillStyle = '#8a7a66';
+            ctx.font = '14px ' + FONT_BODY;
+            ctx.fillText('月俸白银', W/2, boxY + 30);
+
+            // 银两数字（核心数据，要大）
+            const liangText = data.qian > 0 ? data.liang + ' 两 ' + data.qian + ' 钱' : data.liang + ' 两';
+            ctx.fillStyle = '#1a1612';
+            ctx.font = 'bold 44px ' + FONT_BRUSH;
+            ctx.fillText(liangText, W/2, boxY + 78);
+
+            // 今薪换算
+            const salaryText = data.salary >= 10000
+                ? '≈ 今 ¥' + (data.salary / 10000).toFixed(data.salary % 10000 === 0 ? 0 : 1) + '万'
+                : '≈ 今 ¥' + data.salary.toLocaleString();
+            ctx.fillStyle = '#6b6358';
+            ctx.font = '15px ' + FONT_BODY;
+            ctx.fillText(salaryText + '  ·  银价 ¥' + data.price.toFixed(2) + '/克', W/2, boxY + 105);
+
+            // ==================== 趣味评语 ====================
+            const funText = getFunText(data.rank.grade, data.liang);
+
+            // 评语背景装饰
+            ctx.fillStyle = '#c73e3a';
+            ctx.globalAlpha = 0.1;
+            roundRect(ctx, W/2 - 130, 680, 260, 36, 18);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+
+            ctx.fillStyle = '#c73e3a';
+            ctx.font = 'bold 22px ' + FONT_BRUSH;
+            ctx.fillText(funText, W/2, 705);
+
+            // ==================== 底部二维码区 ====================
+            // 分隔线
+            ctx.strokeStyle = '#d0c4b4';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(80, 740);
+            ctx.lineTo(W - 80, 740);
+            ctx.stroke();
+
+            // 二维码 - 背景匹配海报
+            const qrSize = 90;
+            const qrX = W/2 - qrSize/2;
+            const qrY = 765;
+
+            // 背景色匹配海报该位置的颜色（偏下位置更深）
+            await drawQRCode(ctx, 'https://jjjl.lol', qrX, qrY, qrSize, '2d2418', 'e8dcc6');
+
+            // 底部提示
+            ctx.fillStyle = '#8a7a66';
+            ctx.font = '13px ' + FONT_BODY;
+            ctx.fillText('扫码测你几斤几两', W/2, 900);
+
+            // ==================== 转换为图片 ====================
+            const posterImage = document.getElementById('posterImage');
+            posterImage.src = canvas.toDataURL('image/png');
+            posterImage.onload = () => {
+                document.getElementById('posterLoading').classList.add('hidden');
+                posterImage.classList.remove('hidden');
+            };
+        }
+
+        // 文字自动换行
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const chars = text.split('');
+            let line = '';
+            let currentY = y;
+            for (let i = 0; i < chars.length; i++) {
+                const testLine = line + chars[i];
+                if (ctx.measureText(testLine).width > maxWidth && i > 0) {
+                    ctx.fillText(line, x, currentY);
+                    line = chars[i];
+                    currentY += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, x, currentY);
+        }
+
+        // 趣味文案
+        function getFunText(grade, liang) {
+            if (grade.includes('一品') || grade.includes('二品')) return '✦ 位极人臣 · 羡煞旁人 ✦';
+            if (grade.includes('三品') || grade.includes('四品')) return '✦ 封疆大吏 · 前途无量 ✦';
+            if (grade.includes('五品') || grade.includes('六品')) return '✦ 朝廷命官 · 光宗耀祖 ✦';
+            if (grade.includes('七品') || grade.includes('八品')) return '✦ 芝麻小官 · 也是官身 ✦';
+            if (grade.includes('九品') || grade === '未入流') return '✦ 虽是末吏 · 胜于白丁 ✦';
+            if (liang >= 1.5) return '✦ 家有薄产 · 小康人家 ✦';
+            if (liang >= 0.5) return '✦ 勤劳耕作 · 自食其力 ✦';
+            return '✦ 穿越需谨慎 · 搬砖保平安 ✦';
+        }
+
+        // 绘制圆角矩形
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            ctx.lineTo(x + r, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
+            ctx.closePath();
+        }
+
+        // 简易二维码生成（使用第三方API）
+        async function drawQRCode(ctx, url, x, y, size, color = '000000', bgcolor = 'ffffff') {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                    ctx.drawImage(img, x, y, size, size);
+                    resolve();
+                };
+                img.onerror = () => {
+                    // 如果 API 失败，绘制占位符
+                    ctx.fillStyle = '#e8dfd3';
+                    ctx.fillRect(x, y, size, size);
+                    ctx.fillStyle = '#6b6358';
+                    ctx.font = '12px "Noto Serif SC", serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('JJJL.lol', x + size / 2, y + size / 2 + 4);
+                    resolve();
+                };
+                const colorHex = color.replace('#', '');
+                const bgHex = bgcolor.replace('#', '');
+                img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=' + (size*2) + 'x' + (size*2) + '&data=' + encodeURIComponent(url) + '&margin=0&color=' + colorHex + '&bgcolor=' + bgHex;
+            });
+        }
+
+        function downloadPoster() {
+            const canvas = document.getElementById('posterCanvas');
+            const link = document.createElement('a');
+            link.download = '几斤几两-' + currentPosterData.salary + '元.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        async function sharePoster() {
+            const canvas = document.getElementById('posterCanvas');
+            const shareBtn = document.getElementById('shareBtn');
+            const shareBtnText = document.getElementById('shareBtnText');
+            const originalText = shareBtnText.textContent;
+
+            const shareText = '我在明朝是【' + currentPosterData.rank.grade + ' · ' + currentPosterData.rank.position.split('、')[0] + '】！月俸' + currentPosterData.liang + '两白银。来测测你是几斤几两？ jjjl.lol';
+
+            // 微信环境或不支持 Web Share，直接复制文案
+            if (isWeChat) {
+                try {
+                    await navigator.clipboard.writeText(shareText);
+                    showCopied();
+                } catch (err) {
+                    fallbackCopy(shareText);
+                }
+                return;
+            }
+
+            // 尝试 Web Share API（支持分享图片）
+            if (navigator.share && navigator.canShare) {
+                try {
+                    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                    const file = new File([blob], '几斤几两.png', { type: 'image/png' });
+
+                    if (navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            title: '我在明朝是' + currentPosterData.rank.grade,
+                            text: shareText,
+                            files: [file]
+                        });
+                        return;
+                    }
+                } catch (err) {
+                    if (err.name === 'AbortError') return;
+                }
+            }
+
+            // 尝试分享链接
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: '几斤几两 - 月薪换算白银',
+                        text: shareText,
+                        url: 'https://jjjl.lol'
+                    });
+                    return;
+                } catch (err) {
+                    if (err.name === 'AbortError') return;
+                }
+            }
+
+            // 兜底：复制文案
+            try {
+                await navigator.clipboard.writeText(shareText);
+                showCopied();
+            } catch (err) {
+                fallbackCopy(shareText);
+            }
+
+            function showCopied() {
+                shareBtnText.textContent = '已复制 ✓';
+                shareBtn.classList.add('bg-green-600');
+                shareBtn.classList.remove('bg-vermilion', 'hover:bg-vermilion-dark');
+                setTimeout(() => {
+                    shareBtnText.textContent = originalText;
+                    shareBtn.classList.remove('bg-green-600');
+                    shareBtn.classList.add('bg-vermilion', 'hover:bg-vermilion-dark');
+                }, 2000);
+            }
+
+            function fallbackCopy(text) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    showCopied();
+                } catch (e) {
+                    alert('复制失败，请手动复制：' + text);
+                }
+                document.body.removeChild(textarea);
+            }
+        }
+
+        // ESC 键关闭弹窗
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !document.getElementById('posterModal').classList.contains('hidden')) {
+                closePosterModal();
+            }
+        });
     </script>
 </body>
 </html>`;
