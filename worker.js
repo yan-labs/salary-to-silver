@@ -154,7 +154,7 @@ async function generateOGImage(priceData, salary = null) {
     <line x1="40" y1="-15" x2="120" y2="-15" stroke="#c73e3a" stroke-width="1" opacity="0.4"/>
     <circle cx="-130" cy="-15" r="3" fill="#c73e3a" opacity="0.6"/>
     <circle cx="130" cy="-15" r="3" fill="#c73e3a" opacity="0.6"/>
-    <text x="0" y="0" font-family="Georgia, 'Times New Roman', serif" font-size="22" fill="#1a1612" text-anchor="middle" letter-spacing="6" font-weight="500">jjjl.lol</text>
+    <text x="0" y="0" font-family="Georgia, 'Times New Roman', serif" font-size="22" fill="#1a1612" text-anchor="middle" letter-spacing="6" font-weight="500">JJJL.lol</text>
     <line x1="-60" y1="12" x2="60" y2="12" stroke="#c73e3a" stroke-width="1.5" opacity="0.3"/>
   </g>
 </svg>`;
