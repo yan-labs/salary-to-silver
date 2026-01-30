@@ -6,7 +6,7 @@
 
 「几斤几两」是一个有趣的在线工具，可以把你的现代月薪换算成古代白银重量（两、钱），并告诉你在明朝相当于几品官。
 
-**网址**: https://salary-to-silver.kanchaishaoxia.workers.dev/
+**网址**: https://jjjl.lol/
 
 ## 核心功能
 

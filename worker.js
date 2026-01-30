@@ -149,7 +149,7 @@ function renderHTML(priceData) {
     <meta name="keywords" content="月薪换算白银,古代俸禄计算器,明朝官职对照,工资换算银两,几斤几两,白银价格换算,古今收入对比">
     <meta name="author" content="几斤几两">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://salary-to-silver.kanchaishaoxia.workers.dev/">
+    <link rel="canonical" href="https://jjjl.lol/">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
     <!-- Open Graph (实时计算) -->
@@ -158,7 +158,7 @@ function renderHTML(priceData) {
     <meta property="og:site_name" content="几斤几两">
     <meta property="og:title" content="几斤几两 | 你的月薪在明朝值多少两白银？">
     <meta property="og:description" content="当前银价${price}元/克，月薪1万≈${liang10k}两白银≈明朝${rank10k.grade}${rank10k.position.split('、')[0]}">
-    <meta property="og:url" content="https://salary-to-silver.kanchaishaoxia.workers.dev/">
+    <meta property="og:url" content="https://jjjl.lol/">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
@@ -200,7 +200,7 @@ function renderHTML(priceData) {
                 "@type": "WebPage",
                 "name": "几斤几两 - 月薪换算白银",
                 "description": "将现代月薪换算成古代白银重量，匹配明朝官职等级",
-                "url": "https://salary-to-silver.kanchaishaoxia.workers.dev/",
+                "url": "https://jjjl.lol/",
                 "inLanguage": "zh-CN",
                 "dateModified": "${today}",
                 "speakable": {

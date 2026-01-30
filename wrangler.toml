@@ -2,5 +2,17 @@ name = "salary-to-silver"
 main = "worker.js"
 compatibility_date = "2024-01-01"
 
+# 保留 workers.dev 域名
+workers_dev = true
+
+# 自定义域名
+[[routes]]
+pattern = "jjjl.lol/*"
+zone_name = "jjjl.lol"
+
+[[routes]]
+pattern = "www.jjjl.lol/*"
+zone_name = "jjjl.lol"
+
 [assets]
 directory = "./public"
