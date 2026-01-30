@@ -27,4 +27,8 @@ User-agent: Bingbot
 Allow: /
 
 # Sitemap
-Sitemap: https://jijinliang.com/sitemap.xml
+Sitemap: https://salary-to-silver.kanchaishaoxia.workers.dev/sitemap.xml
+
+# LLMs.txt - AI 搜索引擎专用
+# https://llmstxt.org/
+LLMsTxt: https://salary-to-silver.kanchaishaoxia.workers.dev/llms.txt

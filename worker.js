@@ -191,19 +191,29 @@ function renderHTML(priceData) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
 
-    <!-- JSON-LD (实时计算) -->
+    <!-- JSON-LD (实时计算 + GEO优化) -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@graph": [
             {
-                "@type": "WebApplication",
-                "name": "几斤几两 - 俸禄换算器",
+                "@type": "WebPage",
+                "name": "几斤几两 - 月薪换算白银",
                 "description": "将现代月薪换算成古代白银重量，匹配明朝官职等级",
-                "applicationCategory": "UtilityApplication",
-                "operatingSystem": "Any",
                 "url": "https://salary-to-silver.kanchaishaoxia.workers.dev/",
-                "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+                "inLanguage": "zh-CN",
+                "dateModified": "${today}",
+                "speakable": {
+                    "@type": "SpeakableSpecification",
+                    "cssSelector": ["h1", ".summary", "#rankDescription", ".faq-answer"]
+                },
+                "mainEntity": {
+                    "@type": "SoftwareApplication",
+                    "name": "几斤几两 - 俸禄换算器",
+                    "applicationCategory": "UtilityApplication",
+                    "operatingSystem": "Any",
+                    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+                }
             },
             {
                 "@type": "FAQPage",
@@ -275,8 +285,8 @@ function renderHTML(priceData) {
             <p class="text-ink-500 tracking-[0.3em] text-sm">以今度古，量你几何</p>
         </header>
 
-        <section class="bg-paper-200/50 border border-paper-300 rounded-lg p-4 mb-8 text-sm text-ink-700 leading-relaxed animate-fadeUp">
-            <p><strong>月薪1万元 ≈ ${liang10k}两白银 ≈ 明朝${rank10k.grade}${rank10k.position.split('、')[0]}。</strong>输入你的月薪，我们根据实时银价换算成古代白银重量（两/钱），并匹配明朝官职品级。</p>
+        <section class="summary bg-paper-200/50 border border-paper-300 rounded-lg p-4 mb-8 text-sm text-ink-700 leading-relaxed animate-fadeUp">
+            <p><strong>月薪1万元 ≈ ${liang10k}两白银 ≈ 明朝${rank10k.grade}${rank10k.position.split('、')[0]}。</strong>基于<a href="https://goldprice.org" class="text-vermilion hover:underline" target="_blank" rel="noopener">GoldPrice.org</a>实时银价（${price}元/克），我们将你的月薪换算成古代白银重量，并参照《明史·职官志》匹配官职品级。</p>
         </section>
 
         <div class="bg-gradient-to-br from-paper-200 to-paper-100 border border-paper-300 rounded-lg p-4 flex flex-wrap items-center gap-4 mb-8 animate-fadeUp delay-100">
@@ -371,26 +381,26 @@ function renderHTML(priceData) {
             <h2 class="font-display text-lg tracking-[0.15em] text-ink-800 text-center mb-6">常见问题</h2>
             <details class="bg-paper-200/50 border border-paper-300 rounded-lg">
                 <summary class="px-4 py-3 cursor-pointer text-ink-800 font-medium hover:bg-paper-200 transition-colors">月薪1万元相当于多少两白银？</summary>
-                <div class="px-4 pb-4 text-sm text-ink-600 leading-relaxed">
-                    <p>按照当前白银价格（${price}元/克）计算，<strong>月薪1万元约等于${liang10k}两白银</strong>。根据明朝俸禄制度，这相当于${rank10k.grade}${rank10k.position.split('、')[0]}的月俸（${rank10k.monthlyLiang}两），是「${rank10k.description.split('。')[0]}」。</p>
+                <div class="faq-answer px-4 pb-4 text-sm text-ink-600 leading-relaxed">
+                    <p>根据<a href="https://goldprice.org" class="text-vermilion hover:underline" target="_blank" rel="noopener">GoldPrice.org</a>实时数据，当前白银价格为<strong>${price}元/克</strong>，月薪1万元约等于<strong>${liang10k}两白银</strong>。参照《明史·职官志》记载的俸禄制度，这相当于${rank10k.grade}${rank10k.position.split('、')[0]}的月俸（${rank10k.monthlyLiang}两），是「${rank10k.description.split('。')[0]}」。</p>
                 </div>
             </details>
             <details class="bg-paper-200/50 border border-paper-300 rounded-lg">
                 <summary class="px-4 py-3 cursor-pointer text-ink-800 font-medium hover:bg-paper-200 transition-colors">古代一两银子等于多少克？</summary>
-                <div class="px-4 pb-4 text-sm text-ink-600 leading-relaxed">
-                    <p>根据明清标准，<strong>1两银子约等于37.3克</strong>。古代使用十六两制，即1斤=16两≈596.8克。换算公式：白银克数 = 月薪(元) ÷ 银价(元/克)。</p>
+                <div class="faq-answer px-4 pb-4 text-sm text-ink-600 leading-relaxed">
+                    <p>根据《清会典》和明清度量衡研究，<strong>1两银子约等于37.3克</strong>（库平两标准）。古代使用十六两制，即1斤=16两≈596.8克。换算公式：白银克数 = 月薪(元) ÷ 银价(元/克)。</p>
                 </div>
             </details>
             <details class="bg-paper-200/50 border border-paper-300 rounded-lg">
                 <summary class="px-4 py-3 cursor-pointer text-ink-800 font-medium hover:bg-paper-200 transition-colors">明朝各品级官员月俸是多少？</summary>
-                <div class="px-4 pb-4 text-sm text-ink-600 leading-relaxed">
-                    <p>明朝官员俸禄从<strong>正一品太师月俸87两</strong>，到<strong>从九品驿丞月俸5两</strong>不等。正七品县令月俸约7.5两，按现在银价折算约${salary7.toLocaleString()}元。未入流小吏月俸约3两，平民农户约1-2两。</p>
+                <div class="faq-answer px-4 pb-4 text-sm text-ink-600 leading-relaxed">
+                    <p>据《明史·食货志》记载，明朝官员俸禄从<strong>正一品太师年俸1044石（月俸87两）</strong>，到<strong>从九品驿丞年俸60石（月俸5两）</strong>不等。正七品县令月俸约7.5两，按当前银价折算约<strong>${salary7.toLocaleString()}元</strong>。未入流小吏月俸约3两，平民农户约1-2两。</p>
                 </div>
             </details>
             <details class="bg-paper-200/50 border border-paper-300 rounded-lg">
                 <summary class="px-4 py-3 cursor-pointer text-ink-800 font-medium hover:bg-paper-200 transition-colors">这个工具的换算公式是什么？</summary>
-                <div class="px-4 pb-4 text-sm text-ink-600 leading-relaxed">
-                    <p>换算公式为：<strong>白银克数 = 月薪(元) ÷ 当前银价(元/克)</strong>，然后转换为古制单位：1两=37.3克，1两=10钱。例如月薪10000元，银价${price}元/克，得到${Math.round(salary10k/price)}克，约${example.liang}两${example.qian}钱白银。</p>
+                <div class="faq-answer px-4 pb-4 text-sm text-ink-600 leading-relaxed">
+                    <p>换算公式为：<strong>白银克数 = 月薪(元) ÷ 当前银价(元/克)</strong>，然后按明清库平两标准转换：1两=37.3克，1两=10钱。例如月薪10000元，银价${price}元/克，得到${Math.round(salary10k/price)}克，约<strong>${example.liang}两${example.qian}钱</strong>白银。</p>
                 </div>
             </details>
         </section>
