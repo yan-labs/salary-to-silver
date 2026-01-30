@@ -75,10 +75,110 @@ async function getSilverPrice() {
     return { price: DEFAULT_SILVER_PRICE, source: '参考价格', change: 0 };
 }
 
+// ============ OG 图片生成 ============
+async function generateOGImage(priceData, salary = null) {
+    const price = priceData.price;
+
+    // 计算示例数据
+    const targetSalary = salary || 10000;
+    const gram = targetSalary / price;
+    const liangNum = gram / CONVERSION.GRAM_PER_LIANG;
+    const liang = Math.floor(liangNum);
+    const qian = Math.round((liangNum - liang) * 10);
+    const rank = matchRank(liangNum);
+
+    // 格式化显示
+    const liangDisplay = qian > 0 ? `${liang}两${qian}钱` : `${liang}两`;
+    const salaryDisplay = targetSalary >= 10000
+        ? `${(targetSalary/10000).toFixed(targetSalary % 10000 === 0 ? 0 : 1)}万`
+        : targetSalary.toLocaleString();
+
+    // SVG 模板 - 简洁古风设计
+    const svg = `
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8f4ef"/>
+      <stop offset="100%" style="stop-color:#ebe5dc"/>
+    </linearGradient>
+    <filter id="seal-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#1a1612" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="1200" height="630" fill="url(#bg-gradient)"/>
+
+  <!-- 装饰性竖线 -->
+  <line x1="80" y1="80" x2="80" y2="550" stroke="#d4ccc0" stroke-width="1"/>
+  <line x1="1120" y1="80" x2="1120" y2="550" stroke="#d4ccc0" stroke-width="1"/>
+
+  <!-- 左侧：印章区域 -->
+  <g transform="translate(160, 180)">
+    <!-- 印章 -->
+    <g transform="rotate(-6)" filter="url(#seal-shadow)">
+      <rect x="0" y="0" width="140" height="140" rx="8" fill="#c73e3a"/>
+      <text x="70" y="95" font-family="Georgia, serif" font-size="80" fill="#f4ede4" text-anchor="middle" font-weight="bold">${rank.sealChar}</text>
+    </g>
+    <!-- 品级标签 -->
+    <text x="70" y="200" font-family="Georgia, serif" font-size="32" fill="#c73e3a" text-anchor="middle" font-weight="bold">${rank.grade}</text>
+    <text x="70" y="240" font-family="Arial, sans-serif" font-size="20" fill="#6b6358" text-anchor="middle">${rank.position.split('、')[0]}</text>
+  </g>
+
+  <!-- 右侧：核心内容 -->
+  <g transform="translate(380, 0)">
+    <!-- 标题 -->
+    <text x="340" y="120" font-family="Georgia, serif" font-size="52" fill="#1a1612" text-anchor="middle" font-weight="bold" letter-spacing="8">几斤几两</text>
+    <text x="340" y="165" font-family="Arial, sans-serif" font-size="20" fill="#8a8279" text-anchor="middle" letter-spacing="4">以今度古，量你几何</text>
+
+    <!-- 分隔线 -->
+    <line x1="140" y1="200" x2="540" y2="200" stroke="#c73e3a" stroke-width="2" opacity="0.3"/>
+
+    <!-- 换算公式 -->
+    <text x="340" y="270" font-family="Arial, sans-serif" font-size="24" fill="#6b6358" text-anchor="middle">月薪 ¥${salaryDisplay} =</text>
+
+    <!-- 核心数字 -->
+    <text x="340" y="370" font-family="Georgia, serif" font-size="100" fill="#1a1612" text-anchor="middle" font-weight="bold">${liangDisplay}</text>
+    <text x="340" y="420" font-family="Arial, sans-serif" font-size="24" fill="#8a8279" text-anchor="middle">白银</text>
+
+    <!-- 银价标签 -->
+    <g transform="translate(200, 470)">
+      <rect x="0" y="0" width="280" height="40" rx="20" fill="#1a1612" opacity="0.05"/>
+      <text x="140" y="27" font-family="Arial, sans-serif" font-size="16" fill="#6b6358" text-anchor="middle">今日银价 ¥${price.toFixed(2)}/克</text>
+    </g>
+  </g>
+
+  <!-- 底部网址 -->
+  <text x="600" y="590" font-family="Arial, sans-serif" font-size="20" fill="#c73e3a" text-anchor="middle" font-weight="500">jjjl.lol</text>
+</svg>`;
+
+    return svg;
+}
+
+// SVG 转 PNG 备选方案：使用 Cloudflare Browser Rendering（需要付费）
+// 或者使用外部服务如 https://svg2png.com/api
+// 目前先使用 SVG，大多数现代平台已支持
+
 // ============ 主处理函数 ============
 export default {
     async fetch(request, env, ctx) {
         const url = new URL(request.url);
+
+        // OG 图片路由 - 动态生成 SVG
+        // 支持参数: ?salary=10000 自定义月薪
+        if (url.pathname === '/og-image.svg') {
+            const priceData = await getSilverPrice();
+            const salary = url.searchParams.get('salary') ? parseInt(url.searchParams.get('salary')) : null;
+            const svg = await generateOGImage(priceData, salary);
+
+            return new Response(svg, {
+                headers: {
+                    'Content-Type': 'image/svg+xml',
+                    'Cache-Control': 'public, max-age=3600', // 1小时缓存
+                    'Access-Control-Allow-Origin': '*'
+                }
+            });
+        }
 
         // API 路由
         if (url.pathname === '/api/silver-price') {
@@ -159,11 +259,17 @@ function renderHTML(priceData) {
     <meta property="og:title" content="几斤几两 | 你的月薪在明朝值多少两白银？">
     <meta property="og:description" content="当前银价${price}元/克，月薪1万≈${liang10k}两白银≈明朝${rank10k.grade}${rank10k.position.split('、')[0]}">
     <meta property="og:url" content="https://jjjl.lol/">
+    <meta property="og:image" content="https://jjjl.lol/og-image.svg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="几斤几两 - 月薪${Math.round(salary10k/1000)}k换算${liang10k}两白银，相当于明朝${rank10k.grade}">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="几斤几两 | 你的月薪在明朝值多少两白银？">
     <meta name="twitter:description" content="当前银价${price}元/克，月薪1万≈${liang10k}两白银≈明朝${rank10k.grade}">
+    <meta name="twitter:image" content="https://jjjl.lol/og-image.svg">
+    <meta name="twitter:image:alt" content="几斤几两 - 月薪换算白银工具">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -270,6 +376,24 @@ function renderHTML(priceData) {
         #rankTableBody .rank-salary { font-family: 'Ma Shan Zheng', cursive; font-size: 1.1em; }
         #rankTableBody td { padding: 0.5rem 0.75rem; }
     </style>
+
+    <!-- Microsoft Clarity -->
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "v9hn688xbe");
+    </script>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P72ZZGYV58"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-P72ZZGYV58');
+    </script>
 </head>
 <body class="bg-paper-100 text-ink-800 font-song min-h-screen relative overflow-x-hidden">
     <div class="fixed inset-0 paper-texture opacity-[0.03] pointer-events-none z-0"></div>
