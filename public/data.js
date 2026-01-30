@@ -12,7 +12,8 @@ const CONVERSION = {
 };
 
 // 默认银价（元/克），当API获取失败时使用
-const DEFAULT_SILVER_PRICE = 6.5;
+// 2026年1月银价约 22-23 元/克
+const DEFAULT_SILVER_PRICE = 22.5;
 
 // 明朝俸禄品级数据
 // 月俸单位：两
