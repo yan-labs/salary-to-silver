@@ -29,8 +29,10 @@
 
     // 初始化
     function init() {
-        fetchSilverPrice();
-        renderRankTable();
+        fetchSilverPrice().then(() => {
+            renderRankTable();
+            updateFAQ();
+        });
         bindEvents();
     }
 
@@ -160,12 +162,8 @@
         const tbody = elements.rankTableBody;
         tbody.innerHTML = '';
 
-        // 只显示官职等级（不显示平民等级）
-        const officialRanks = RANK_DATA.filter(r =>
-            r.grade.includes('品') || r.grade === '未入流'
-        );
-
-        officialRanks.forEach(rank => {
+        // 显示所有等级（包括平民等级）
+        RANK_DATA.forEach(rank => {
             const modernSalary = (rank.monthlyLiang * CONVERSION.GRAM_PER_LIANG * currentSilverPrice).toFixed(0);
 
             const tr = document.createElement('tr');
@@ -198,6 +196,51 @@
                     block: 'nearest'
                 });
             }, 800);
+        }
+    }
+
+    // 更新 FAQ 中的动态数据
+    function updateFAQ() {
+        const price = currentSilverPrice;
+
+        // 月薪1万换算
+        const salary10k = 10000;
+        const gram10k = salary10k / price;
+        const liang10k = (gram10k / CONVERSION.GRAM_PER_LIANG).toFixed(1);
+        const rank10k = matchRank(gram10k / CONVERSION.GRAM_PER_LIANG);
+
+        // 正七品县令月俸折算
+        const rank7 = RANK_DATA.find(r => r.grade === '正七品');
+        const salary7 = (rank7.monthlyLiang * CONVERSION.GRAM_PER_LIANG * price).toFixed(0);
+
+        // 更新 FAQ 内容
+        const faq1 = document.getElementById('faq1-answer');
+        const faq2 = document.getElementById('faq2-answer');
+        const faq3 = document.getElementById('faq3-answer');
+        const faq4 = document.getElementById('faq4-answer');
+
+        if (faq1) {
+            faq1.innerHTML = `按照当前白银价格（约${price.toFixed(1)}元/克）计算，<strong>月薪1万元约等于${liang10k}两白银</strong>。根据明朝俸禄制度，这相当于${rank10k.grade}${rank10k.position.split('、')[0]}的月俸（${rank10k.monthlyLiang}两），是「${rank10k.description.split('。')[0]}」。`;
+        }
+
+        if (faq2) {
+            faq2.innerHTML = `根据明清标准，<strong>1两银子约等于37.3克</strong>。古代使用十六两制，即1斤=16两≈596.8克。换算公式：白银克数 = 月薪(元) ÷ 银价(元/克)。`;
+        }
+
+        if (faq3) {
+            faq3.innerHTML = `明朝官员俸禄从<strong>正一品太师月俸87两</strong>，到<strong>从九品驿丞月俸5两</strong>不等。正七品县令月俸约7.5两，按现在银价折算约${Number(salary7).toLocaleString()}元。未入流小吏月俸约3两，平民农户约1-2两。`;
+        }
+
+        if (faq4) {
+            const exampleGram = (10000 / price).toFixed(0);
+            const exampleResult = gramToLiangQian(10000 / price);
+            faq4.innerHTML = `换算公式为：<strong>白银克数 = 月薪(元) ÷ 当前银价(元/克)</strong>，然后转换为古制单位：1两=37.3克，1两=10钱。例如月薪10000元，银价${price.toFixed(1)}元/克，得到${exampleGram}克，约${exampleResult.liang}两${exampleResult.qian}钱白银。`;
+        }
+
+        // 更新简介
+        const summary = document.getElementById('summary-text');
+        if (summary) {
+            summary.innerHTML = `<strong>月薪1万元 ≈ ${liang10k}两白银 ≈ 明朝${rank10k.grade}${rank10k.position.split('、')[0]}。</strong>输入你的月薪，我们根据实时银价换算成古代白银重量（两/钱），并匹配明朝官职品级。基于明朝俸禄制度，1石米≈折银1两。`;
         }
     }
 
