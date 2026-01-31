@@ -75,8 +75,9 @@ const RANK_DATA = RANK_DATA_ZH_CN;
 const TRANSLATIONS = {
     'zh-CN': {
         meta: {
-            title: '几斤几两 | 月薪换算白银 - 看看你的工资在明朝值多少两银子',
-            ogTitle: '几斤几两 | 你的月薪在明朝值多少两白银？',
+            title: '明朝官职俸禄查询 | 月薪换算古代银子',
+            ogTitle: '几斤几两 | 明朝官职俸禄查询 | 你的月薪在古代值多少银子？',
+            description: '查询明朝官员俸禄！输入月薪，自动换算成古代银子两数，对照明朝官职品级，了解你的工资在古代是什么级别。',
             siteName: '几斤几两',
         },
         ui: {
@@ -155,8 +156,9 @@ const TRANSLATIONS = {
     },
     'zh-TW': {
         meta: {
-            title: '幾斤幾兩 | 月薪換算白銀 - 看看你的薪水在明朝值多少兩銀子',
-            ogTitle: '幾斤幾兩 | 你的月薪在明朝值多少兩白銀？',
+            title: '明朝官職俸祿查詢 | 月薪換算古代銀子',
+            ogTitle: '幾斤幾兩 | 明朝官職俸祿查詢 | 你的月薪在古代值多少銀子？',
+            description: '查詢明朝官員俸祿！輸入月薪，自動換算成古代銀子兩數，對照明朝官職品級，了解你的薪水在古代是什麼級別。',
             siteName: '幾斤幾兩',
         },
         ui: {
@@ -500,8 +502,8 @@ function renderHTML(priceData, locale = DEFAULT_LOCALE) {
         : '月薪换算白银,古代俸禄计算器,明朝官职对照,工资换算银两,几斤几两,白银价格换算,古今收入对比';
 
     const ogDescText = locale === 'zh-TW'
-        ? `當前銀價${price}元/克，月薪1萬≈${liang10k}兩白銀≈明朝${rank10k.grade}${rank10k.position.split('、')[0]}`
-        : `当前银价${price}元/克，月薪1万≈${liang10k}两白银≈明朝${rank10k.grade}${rank10k.position.split('、')[0]}`;
+        ? `查詢明朝官員俸祿！月薪換算古代銀子，對照明朝官職品級，了解你的薪水在古代是什麼級別。`
+        : `查询明朝官员俸禄！月薪换算古代银子，对照官职品级，了解你的工资在古代是什么级别。`;
 
     const ogImageAlt = locale === 'zh-TW'
         ? `幾斤幾兩 - 月薪${Math.round(salary10k/1000)}k換算${liang10k}兩白銀，相當於明朝${rank10k.grade}`
@@ -731,7 +733,7 @@ function renderHTML(priceData, locale = DEFAULT_LOCALE) {
         </header>
 
         <section class="summary bg-paper-200/50 border border-paper-300 rounded-lg p-4 mb-8 text-sm text-ink-700 leading-relaxed animate-fadeUp">
-            <p><strong>${locale === 'zh-TW' ? `月薪1萬元 ≈ ${liang10k}兩白銀 ≈ 明朝${rank10k.grade}${rank10k.position.split('、')[0]}。` : `月薪1万元 ≈ ${liang10k}两白银 ≈ 明朝${rank10k.grade}${rank10k.position.split('、')[0]}。`}</strong>${locale === 'zh-TW' ? `基於<a href="https://goldprice.org" class="text-vermilion hover:underline" target="_blank" rel="noopener">GoldPrice.org</a>即時銀價（${price}元/克），我們將你的月薪換算成古代白銀重量，並參照《明史·職官志》匹配官職品級。` : `基于<a href="https://goldprice.org" class="text-vermilion hover:underline" target="_blank" rel="noopener">GoldPrice.org</a>实时银价（${price}元/克），我们将你的月薪换算成古代白银重量，并参照《明史·职官志》匹配官职品级。`}</p>
+            <p><strong>${locale === 'zh-TW' ? `月薪1萬元 ≈ ${liang10k}兩白銀 ≈ 明朝${rank10k.grade}${rank10k.position.split('、')[0]}。` : `月薪1万元 ≈ ${liang10k}两白银 ≈ 明朝${rank10k.grade}${rank10k.position.split('、')[0]}。`}</strong>${locale === 'zh-TW' ? `基於<a href="https://goldprice.org" class="text-vermilion hover:underline" target="_blank" rel="noopener">GoldPrice.org</a>即時銀價（${price}元/克），我們將你的月薪換算成古代白銀重量，並參照《明史·職官志》<strong>匹配官職品級</strong>，查詢明朝官員俸祿與古代貨幣換算。` : `基于<a href="https://goldprice.org" class="text-vermilion hover:underline" target="_blank" rel="noopener">GoldPrice.org</a>实时银价（${price}元/克），我们将你的月薪换算成古代白银重量，并参照《明史·职官志》<strong>匹配官职品级</strong>，查询明朝官员俸禄与古代货币换算。`}</p>
         </section>
 
         <div class="bg-gradient-to-br from-paper-200 to-paper-100 border border-paper-300 rounded-lg p-4 flex flex-wrap items-center gap-4 mb-8 animate-fadeUp delay-100">
